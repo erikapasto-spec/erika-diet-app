@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erika · Il mio percorso</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --sage: #E07FA0;
+    --sage-light: #F2AECA;
+    --sage-pale: #FDE8F0;
+    --charcoal: #3D2535;
+    --warm-white: #FFF5F8;
+    --muted: #A07080;
+    --accent: #C45A7A;
+    --accent-light: #FCE0EA;
+    --border: #F0CEDE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--charcoal);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Cuori decorativi fissi sullo sfondo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M20 34 C20 34 4 24 4 14 C4 8 9 4 14 6 C17 7 20 10 20 10 C20 10 23 7 26 6 C31 4 36 8 36 14 C36 24 20 34 20 34Z' fill='%23FFB6CC' opacity='0.18'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 40 40'%3E%3Cpath d='M20 34 C20 34 4 24 4 14 C4 8 9 4 14 6 C17 7 20 10 20 10 C20 10 23 7 26 6 C31 4 36 8 36 14 C36 24 20 34 20 34Z' fill='%23F48FB1' opacity='0.12'/%3E%3C/svg%3E");
+    background-position: 10% 8%, 80% 20%, 30% 60%, 70% 75%;
+    background-repeat: repeat;
+    background-size: 120px 120px, 70px 70px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  .nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: white;
+    border-top: 2px solid var(--border);
+    display: flex;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1; padding: 12px 0 10px;
+    border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--sage); }
+  .nav-btn svg { width: 22px; height: 22px; }
+
+  /* HEADER */
+  .header {
+    padding: 56px 24px 20px;
+    background: linear-gradient(135deg, #F8B4CE 0%, #F48FB1 50%, #E07FA0 100%);
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Cuori bianchi nell'header */
+  .header::before {
+    content: '♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡';
+    position: absolute;
+    top: 8px; left: 0; right: 0;
+    font-size: 14px; color: rgba(255,255,255,0.3);
+    letter-spacing: 6px; text-align: center;
+    white-space: nowrap; overflow: hidden;
+  }
+  .header::after {
+    content: '♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡';
+    position: absolute;
+    bottom: 6px; left: 0; right: 0;
+    font-size: 11px; color: rgba(255,255,255,0.2);
+    letter-spacing: 8px; text-align: center;
+    white-space: nowrap; overflow: hidden;
+  }
+  .header-label {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.8); margin-bottom: 4px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 400;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* SCREENS */
+  .screen { display: none; padding: 0 0 90px; }
+  .screen.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: white; margin: 16px; border-radius: 16px;
+    padding: 20px; border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .card::after {
+    content: '♡';
+    position: absolute; bottom: 8px; right: 14px;
+    font-size: 22px; color: var(--border); pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; margin-bottom: 12px; color: var(--charcoal);
+  }
+
+  /* MOTIVATIONAL BANNER */
+  .motiv-banner {
+    background: linear-gradient(135deg, #E07FA0 0%, #C45A7A 100%);
+    margin: 16px; border-radius: 20px; padding: 24px 20px;
+    color: white; position: relative; overflow: hidden;
+  }
+  .motiv-banner::before {
+    content: '♡';
+    position: absolute; right: 18px; top: 14px;
+    font-size: 44px; opacity: 0.18;
+  }
+  .motiv-banner::after {
+    content: '♡ ♡ ♡';
+    position: absolute; bottom: 8px; left: 16px;
+    font-size: 11px; opacity: 0.2; letter-spacing: 4px;
+  }
+  .motiv-banner .label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.8; margin-bottom: 8px;
+  }
+  .motiv-banner .quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-style: italic; line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .motiv-btn {
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: white; border-radius: 20px;
+    padding: 8px 16px; font-size: 13px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+  }
+  .motiv-btn:hover { background: rgba(255,255,255,0.35); }
+
+  /* PROGRESS */
+  .progress-block { margin: 16px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .progress-label { font-size: 12px; color: var(--muted); }
+  .progress-kg { font-family: 'Playfair Display', serif; font-size: 22px; }
+  .progress-kg span { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+  .progress-bar-track {
+    height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--sage-light), var(--sage));
+    transition: width 1s ease;
+  }
+  .milestones { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
+  .milestone {
+    flex: 1; text-align: center; padding: 10px 4px;
+    border-radius: 10px; background: var(--sage-pale);
+    border: 1px solid var(--border);
+  }
+  .milestone.reached { background: var(--sage); border-color: var(--sage); }
+  .milestone.reached .m-label, .milestone.reached .m-val { color: white; }
+  .m-val { font-weight: 500; font-size: 14px; }
+  .m-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* PESO */
+  .peso-input-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .peso-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 12px 16px; font-size: 22px; font-family: 'Playfair Display', serif;
+    text-align: center; outline: none; background: var(--sage-pale);
+    color: var(--charcoal);
+  }
+  .peso-input:focus { border-color: var(--sage); }
+  .btn-primary {
+    background: var(--sage); color: white; border: none;
+    border-radius: 12px; padding: 13px 20px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s; white-space: nowrap;
+  }
+  .btn-primary:hover { background: #cc6e8f; }
+  .btn-secondary {
+    background: var(--accent-light); color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 12px;
+    padding: 10px 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; cursor: pointer; transition: all 0.2s;
+  }
+
+  /* PESO HISTORY */
+  .peso-history { margin-top: 8px; }
+  .peso-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .peso-row:last-child { border-bottom: none; }
+  .peso-date { font-size: 13px; color: var(--muted); }
+  .peso-val { font-weight: 500; }
+  .peso-delta { font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+  .delta-down { background: #e8f5e9; color: #388e3c; }
+  .delta-up { background: #fce4ec; color: #c62828; }
+  .delta-same { background: var(--border); color: var(--muted); }
+
+  /* DIETA */
+  .day-tabs {
+    display: flex; gap: 6px; padding: 0 16px; overflow-x: auto;
+    scrollbar-width: none; margin-bottom: 4px;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex-shrink: 0; padding: 7px 14px; border-radius: 20px;
+    border: 1.5px solid var(--border); background: white;
+    font-size: 13px; cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .day-tab.active {
+    background: var(--sage); color: white; border-color: var(--sage);
+  }
+
+  .meal-block { margin: 0 16px 12px; }
+  .meal-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .meal-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .meal-title { font-weight: 500; font-size: 15px; }
+  .meal-kcal { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .meal-card {
+    background: white; border-radius: 14px; padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .meal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; margin-bottom: 6px;
+  }
+  .meal-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .meal-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; padding: 3px 10px; border-radius: 10px;
+    background: var(--sage-pale); color: var(--sage);
+    border: 1px solid var(--sage-light);
+  }
+  .tag.gluten { background: var(--accent-light); color: var(--accent); border-color: #e8b49f; }
+  .recipe-btn {
+    margin-top: 12px; width: 100%;
+    background: var(--sage-pale); color: var(--sage);
+    border: 1.5px solid var(--sage-light); border-radius: 10px;
+    padding: 9px; font-size: 13px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .recipe-btn:hover { background: var(--sage-light); }
+
+  /* FOTO CIBO */
+  .upload-zone {
+    border: 2px dashed var(--sage-light); border-radius: 16px;
+    padding: 40px 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: var(--sage-pale);
+  }
+  .upload-zone:hover { border-color: var(--sage); background: #f9d0e0; }
+  .upload-icon { font-size: 40px; margin-bottom: 10px; }
+  .upload-text { font-size: 14px; color: var(--muted); }
+  .upload-text strong { color: var(--sage); display: block; margin-bottom: 4px; font-size: 16px; }
+  #foto-input { display: none; }
+  .foto-preview { width: 100%; border-radius: 12px; margin-bottom: 12px; max-height: 220px; object-fit: cover; }
+
+  /* AI RESPONSE */
+  .ai-response {
+    background: linear-gradient(135deg, #fce8f0, #f9d4e3);
+    border: 1.5px solid var(--sage-light); border-radius: 14px;
+    padding: 18px; margin-top: 12px;
+  }
+  .ai-label {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .ai-text { font-size: 14px; line-height: 1.6; color: var(--charcoal); }
+
+  /* RECIPE MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 24px 24px 0 0;
+    width: 100%; max-width: 480px; max-height: 85vh;
+    overflow-y: auto; padding: 24px;
+  }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 20px;
+  }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 16px; }
+  .recipe-section { margin-bottom: 16px; }
+  .recipe-section h4 { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .recipe-section p, .recipe-section li { font-size: 14px; line-height: 1.7; color: var(--charcoal); }
+  .recipe-section ul, .recipe-section ol { padding-left: 18px; }
+  .recipe-section li { margin-bottom: 4px; }
+  .close-modal {
+    width: 100%; background: var(--sage); color: white;
+    border: none; border-radius: 12px; padding: 14px;
+    font-size: 15px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--muted); font-size: 13px; padding: 12px 0;
+  }
+  .spinner {
+    width: 18px; height: 18px; border: 2px solid var(--sage-light);
+    border-top-color: var(--sage); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--charcoal); color: white; padding: 12px 20px;
+    border-radius: 20px; font-size: 14px; z-index: 300;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* INSPO PHOTO */
+  .inspo-card {
+    margin: 16px; border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--border); background: white;
+    position: relative;
+  }
+  .inspo-photo {
+    width: 100%; max-height: 280px; object-fit: cover;
+    display: block;
+  }
+  .inspo-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+    padding: 20px 18px 16px;
+    color: white;
+  }
+  .inspo-overlay .inspo-label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.8; margin-bottom: 4px;
+  }
+  .inspo-overlay .inspo-caption {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-style: italic; line-height: 1.4;
+  }
+  .inspo-empty {
+    border: 2px dashed var(--border); border-radius: 20px;
+    margin: 16px; padding: 32px 20px; text-align: center;
+    cursor: pointer; transition: all 0.2s; background: white;
+  }
+  .inspo-empty:hover { border-color: var(--accent); background: var(--accent-light); }
+  .inspo-empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .inspo-empty-text { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .inspo-empty-text strong { display: block; color: var(--accent); font-size: 15px; margin-bottom: 4px; }
+  .inspo-change-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5);
+    color: white; border-radius: 16px; padding: 5px 12px;
+    font-size: 11px; cursor: pointer; backdrop-filter: blur(4px);
+    font-family: 'DM Sans', sans-serif;
+  }
+  #inspo-input { display: none; }
+
+  /* LISTA SPESA */
+  .spesa-category { margin-bottom: 20px; }
+  .spesa-cat-title {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spesa-cat-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .spesa-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; background: white; border-radius: 12px;
+    border: 1px solid var(--border); margin-bottom: 6px;
+    cursor: pointer; transition: all 0.18s; user-select: none;
+  }
+  .spesa-item:active { transform: scale(0.98); }
+  .spesa-item.checked { background: var(--sage-pale); border-color: var(--sage-light); }
+  .spesa-check {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s; background: white;
+  }
+  .spesa-item.checked .spesa-check {
+    background: var(--sage); border-color: var(--sage);
+  }
+  .spesa-check-icon { display: none; color: white; font-size: 13px; font-weight: 700; }
+  .spesa-item.checked .spesa-check-icon { display: block; }
+  .spesa-name {
+    flex: 1; font-size: 14px; transition: all 0.18s;
+  }
+  .spesa-item.checked .spesa-name {
+    text-decoration: line-through; color: var(--muted);
+  }
+  .spesa-qty {
+    font-size: 12px; color: var(--muted); white-space: nowrap;
+  }
+
+  /* SNACK OPTIONS */
+  .snack-option {
+    flex: 1; background: white; border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 14px 12px; text-align: center;
+    transition: all 0.2s;
+  }
+  .snack-option.snack-logged {
+    background: var(--sage-pale); border-color: var(--sage-light);
+  }
+  .snack-icon { font-size: 24px; margin-bottom: 6px; }
+  .snack-name { font-weight: 500; font-size: 13px; margin-bottom: 3px; color: var(--charcoal); }
+  .snack-kcal { font-size: 12px; color: var(--sage); font-weight: 500; margin-bottom: 4px; }
+  .snack-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* MEAL CHECK BUTTON */
+  .meal-check-btn {
+    flex-shrink: 0;
+    background: white;
+    border: 1.5px solid var(--sage-light);
+    color: var(--sage);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .meal-check-btn:hover { background: var(--sage-pale); }
+  .meal-check-btn.logged {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  /* DIARIO CALORIE */
+  .kcal-today-bar {
+    margin: 16px; border-radius: 16px;
+    background: white; border: 1px solid var(--border); padding: 18px;
+  }
+  .kcal-today-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .kcal-today-num { font-family:'Playfair Display',serif; font-size:32px; }
+  .kcal-today-num span { font-size:14px; font-family:'DM Sans',sans-serif; color:var(--muted); }
+  .kcal-target-label { font-size:12px; color:var(--muted); }
+  .kcal-track { height:10px; background:var(--border); border-radius:5px; overflow:hidden; margin-bottom:8px; }
+  .kcal-track-fill { height:100%; border-radius:5px; transition:width 0.8s ease; background:linear-gradient(90deg,var(--sage-light),var(--sage)); }
+  .kcal-track-fill.over { background:linear-gradient(90deg,#f4a46a,#c45a7a); }
+  .kcal-meals-list { margin-top:12px; }
+  .kcal-meal-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:9px 0; border-bottom:1px solid var(--border); font-size:13px;
+  }
+  .kcal-meal-row:last-child { border-bottom:none; }
+  .kcal-meal-name { color:var(--charcoal); flex:1; }
+  .kcal-meal-time { color:var(--muted); font-size:11px; margin-right:10px; }
+  .kcal-meal-val { font-weight:500; color:var(--sage); }
+  .kcal-meal-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:0 0 0 8px; }
+
+  .kcal-week-chart { margin:16px; }
+  .kcal-week-title { font-family:'Playfair Display',serif; font-size:16px; margin-bottom:12px; padding:0 2px; }
+  .kcal-bars { display:flex; align-items:flex-end; gap:8px; height:100px; }
+  .kcal-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .kcal-bar {
+    width:100%; border-radius:6px 6px 0 0;
+    background:var(--sage-light); min-height:4px;
+    transition:height 0.6s ease; position:relative;
+  }
+  .kcal-bar.today { background:var(--sage); }
+  .kcal-bar.over { background:var(--accent); }
+  .kcal-bar-day { font-size:10px; color:var(--muted); }
+  .kcal-bar-val { font-size:9px; color:var(--muted); }
+
+  .add-kcal-btn {
+    margin:0 16px 16px; width:calc(100% - 32px);
+    background:var(--sage-pale); color:var(--sage);
+    border:1.5px dashed var(--sage-light); border-radius:12px;
+    padding:12px; font-size:13px; cursor:pointer;
+    font-family:'DM Sans',sans-serif; transition:all 0.2s;
+  }
+  .add-kcal-btn:hover { background:var(--sage-light); }
+
+  /* manual kcal input */
+  .kcal-manual-form {
+    margin:0 16px 16px; background:white; border:1px solid var(--border);
+    border-radius:14px; padding:16px; display:none;
+  }
+  .kcal-manual-form.open { display:block; }
+  .kcal-manual-row { display:flex; gap:8px; margin-top:10px; }
+  .kcal-manual-input {
+    flex:1; border:1.5px solid var(--border); border-radius:10px;
+    padding:10px 14px; font-size:14px; outline:none;
+    font-family:'DM Sans',sans-serif;
+  }
+  .kcal-manual-input:focus { border-color:var(--sage); }
+
+  /* coach menu-change chip */
+  .menu-change-chip {
+    background:var(--accent-light); border:1px solid #e8b49f;
+    border-radius:12px; padding:12px 14px; margin-top:10px;
+    font-size:13px; color:var(--charcoal); line-height:1.5;
+  }
+  .menu-apply-btn {
+    margin-top:10px; background:var(--accent); color:white;
+    border:none; border-radius:10px; padding:9px 16px;
+    font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif;
+    transition:background 0.2s;
+  }
+  .menu-apply-btn:hover { background:#b8674f; }
+  .chat-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 20px 14px; background: white;
+    border-bottom: 1px solid var(--border);
+  }
+  .coach-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, #F48FB1, #E07FA0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .coach-name { font-weight: 500; font-size: 16px; }
+  .coach-sub { font-size: 12px; color: var(--sage); margin-top: 1px; }
+
+  .chat-messages {
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto;
+    min-height: calc(100vh - 320px);
+    padding-bottom: 8px;
+  }
+  .chat-bubble {
+    max-width: 82%; padding: 13px 16px; border-radius: 18px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .coach-bubble {
+    background: var(--sage-pale); border: 1px solid var(--sage-light);
+    color: var(--charcoal); align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .user-bubble {
+    background: linear-gradient(135deg, #E07FA0, #C45A7A); color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .coach-typing {
+    background: var(--sage-pale); border: 1px solid var(--sage-light);
+    align-self: flex-start; padding: 14px 18px; border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .typing-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--sage); opacity: 0.5;
+    animation: typingPulse 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingPulse { 0%,80%,100%{opacity:0.3;transform:scale(1)} 40%{opacity:1;transform:scale(1.2)} }
+
+  .chat-suggestions {
+    padding: 0 16px 8px; display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .sugg-btn {
+    background: white; border: 1.5px solid var(--sage-light);
+    border-radius: 20px; padding: 7px 14px;
+    font-size: 12px; color: var(--sage); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .sugg-btn:hover { background: var(--sage-pale); }
+
+  .chat-input-bar {
+    position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    display: flex; align-items: flex-end; gap: 10px;
+    padding: 10px 16px; background: white;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+  .chat-input-bar.visible { display: flex; }
+  .chat-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 10px 16px; font-size: 14px; resize: none; outline: none;
+    font-family: 'DM Sans', sans-serif; max-height: 100px; overflow-y: auto;
+    line-height: 1.4; transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--sage); }
+  .chat-send {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--sage); border: none; color: white;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+  }
+  .chat-send:hover { background: #6a8e6f; }
+
+  .section-pad { padding: 16px 0 0; }
+  .info-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent-light); color: var(--accent);
+    border-radius: 20px; padding: 6px 14px; font-size: 12px;
+    margin: 0 16px 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="recipeModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="recipeTitle"></div>
+    <div id="recipeContent"></div>
+    <button class="close-modal" onclick="closeModal()">Chiudi</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Il mio percorso</div>
+  <div class="header-title" id="screenTitle">Buongiorno, Erika ✦</div>
+</div>
+
+<!-- SCREEN: HOME -->
+<div class="screen active" id="screen-home">
+
+  <!-- Cuori decorativi animati -->
+  <div style="position:relative;height:0;overflow:visible;">
+    <svg style="position:absolute;top:-10px;right:20px;opacity:0.12;pointer-events:none;" width="60" height="60" viewBox="0 0 40 40">
+      <path d="M20 34 C20 34 4 24 4 14 C4 8 9 4 14 6 C17 7 20 10 20 10 C20 10 23 7 26 6 C31 4 36 8 36 14 C36 24 20 34 20 34Z" fill="#E07FA0"/>
+    </svg>
+    <svg style="position:absolute;top:10px;left:14px;opacity:0.08;pointer-events:none;" width="35" height="35" viewBox="0 0 40 40">
+      <path d="M20 34 C20 34 4 24 4 14 C4 8 9 4 14 6 C17 7 20 10 20 10 C20 10 23 7 26 6 C31 4 36 8 36 14 C36 24 20 34 20 34Z" fill="#C45A7A"/>
+    </svg>
+  </div>
+
+  <!-- Motivazionale -->
+  <div class="motiv-banner" id="motivBanner">
+    <div class="label">Messaggio del giorno</div>
+    <div class="quote" id="motivQuote">Caricamento...</div>
+    <button class="motiv-btn" onclick="loadMotivation()">Nuovo messaggio ↻</button>
+  </div>
+
+  <!-- Inspo Photo -->
+  <input type="file" id="inspo-input" accept="image/*" onchange="handleInspoUpload(event)">
+  <div id="inspoWrap"></div>
+
+  <!-- Progress -->
+  <div class="progress-block">
+    <div class="progress-header">
+      <span class="progress-label">Verso 65 kg</span>
+      <div class="progress-kg" id="progressKg">73 <span>kg attuali</span></div>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:var(--muted);">
+      <span>Partenza: 73 kg</span>
+      <span id="progressPct">0% completato</span>
+      <span>Goal: 65 kg</span>
+    </div>
+  </div>
+
+  <!-- Milestones -->
+  <div class="card">
+    <div class="card-title">Obiettivi intermedi</div>
+    <div class="milestones" id="milestonesWrap">
+      <div class="milestone" id="m1"><div class="m-val">71 kg</div><div class="m-label">-2 kg</div></div>
+      <div class="milestone" id="m2"><div class="m-val">69 kg</div><div class="m-label">-4 kg</div></div>
+      <div class="milestone" id="m3"><div class="m-val">67 kg</div><div class="m-label">-6 kg</div></div>
+      <div class="milestone" id="m4"><div class="m-val">65 kg</div><div class="m-label">🎯 Goal</div></div>
+    </div>
+  </div>
+
+  <!-- Peso lunedì -->
+  <div class="card" id="pesoCard">
+    <div class="card-title">📍 Pesa-ti — è lunedì!</div>
+    <div class="peso-input-wrap">
+      <input type="number" class="peso-input" id="pesoInput" placeholder="73.0" step="0.1" min="50" max="150">
+      <button class="btn-primary" onclick="savePeso()">Salva</button>
+    </div>
+    <div style="font-size:12px; color:var(--muted)">Inserisci il tuo peso ogni lunedì mattina, a digiuno.</div>
+  </div>
+
+  <!-- Storico pesi -->
+  <div class="card">
+    <div class="card-title">Andamento pesi</div>
+    <div class="peso-history" id="pesoHistory">
+      <div style="color:var(--muted); font-size:13px;">Nessun peso registrato ancora.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SCREEN: DIETA -->
+<div class="screen" id="screen-dieta">
+  <div class="section-pad"></div>
+  <div class="info-chip">🌿 Low-carb · Crohn-friendly · Senza glutine/lattosio</div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div id="dietaContent"></div>
+</div>
+
+<!-- SCREEN: FOTO -->
+<div class="screen" id="screen-foto">
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">📸 Analizza il tuo pasto</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5;">
+      Carica una foto — l'AI stima le calorie e le salva nel tuo diario giornaliero.
+    </p>
+
+    <label for="foto-input">
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">🥗</div>
+        <div class="upload-text">
+          <strong>Tocca per caricare una foto</strong>
+          Scatta o scegli dalla galleria
+        </div>
+      </div>
+    </label>
+    <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="handleFotoUpload(event)">
+
+    <div id="fotoPreviewWrap" style="display:none; margin-top:12px;">
+      <img id="fotoPreview" class="foto-preview" alt="Anteprima">
+      <div style="display:flex; gap:8px;">
+        <button class="btn-primary" style="flex:1;" onclick="analyzeFood()">Analizza con AI</button>
+        <button class="btn-secondary" onclick="resetFoto()">Cambia</button>
+      </div>
+    </div>
+
+    <div id="fotoAnalysis"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Come funziona</div>
+    <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+      1. Scatta la foto del piatto prima di mangiare<br>
+      2. L'AI stima le calorie e i macronutrienti<br>
+      3. Tocca <strong>Salva nel diario</strong> per registrarle<br>
+      4. Nel tab Calorie vedi il totale giornaliero e settimanale
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: CALORIE -->
+<div class="screen" id="screen-calorie">
+
+  <!-- Oggi -->
+  <div class="kcal-today-bar">
+    <div class="kcal-today-header">
+      <div>
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Oggi</div>
+        <div class="kcal-today-num" id="kcalTodayNum">0 <span>kcal</span></div>
+      </div>
+      <div style="text-align:right;">
+        <div class="kcal-target-label">Target</div>
+        <div style="font-weight:500;font-size:15px;" id="kcalTargetNum">1450 kcal</div>
+      </div>
+    </div>
+    <div class="kcal-track">
+      <div class="kcal-track-fill" id="kcalTrackFill" style="width:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+      <span id="kcalRemainingLabel">1450 kcal rimanenti</span>
+      <span id="kcalPctLabel">0%</span>
+    </div>
+    <div class="kcal-meals-list" id="kcalMealsList"></div>
+  </div>
+
+  <!-- Aggiungi manuale -->
+  <button class="add-kcal-btn" onclick="toggleManualKcal()">＋ Aggiungi pasto manualmente</button>
+  <div class="kcal-manual-form" id="kcalManualForm">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Aggiungi pasto</div>
+    <input class="kcal-manual-input" id="manualMealName" placeholder="Es. Pranzo · Caesar salad" style="width:100%;margin-bottom:8px;">
+    <div class="kcal-manual-row">
+      <input class="kcal-manual-input" id="manualMealKcal" placeholder="kcal" type="number" min="0" max="2000">
+      <button class="btn-primary" onclick="saveManualKcal()">Aggiungi</button>
+    </div>
+  </div>
+
+  <!-- Grafico settimana -->
+  <div class="kcal-week-chart">
+    <div class="kcal-week-title">Questa settimana</div>
+    <div class="kcal-bars" id="kcalWeekBars"></div>
+  </div>
+
+</div>
+
+<!-- SCREEN: COACH -->
+<div class="screen" id="screen-coach">
+  <div class="chat-header">
+    <div class="coach-avatar">💚</div>
+    <div>
+      <div class="coach-name">La tua Coach AI</div>
+      <div class="coach-sub">Sono qui quando ne hai bisogno</div>
+    </div>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-bubble coach-bubble">
+      Ciao Erika! 🌿 Sono la tua coach personale. So che stai lavorando sodo per raggiungere i tuoi 65 kg, e so anche che non è sempre facile — con il Crohn, il lavoro, la vita.<br><br>
+      Dimmi tutto: cosa ti pesa oggi? Hai ceduto a qualcosa? Sei stanca? Hai dubbi sulla dieta? Sono qui, senza giudizi. 💬
+    </div>
+  </div>
+
+  <div class="chat-suggestions" id="chatSuggestions">
+    <button class="sugg-btn" onclick="sendQuick('Ho ceduto e ho mangiato cose che non dovevo 😔')">Ho ceduto oggi</button>
+    <button class="sugg-btn" onclick="sendQuick('Sono a un punto di stallo, il peso non scende più')">Peso fermo</button>
+    <button class="sugg-btn" onclick="sendQuick('Non ho voglia di seguire la dieta, sono demotivata')">Sono demotivata</button>
+    <button class="sugg-btn" onclick="sendQuick('Ho bisogno di incoraggiamento!')">Incoraggiami!</button>
+  </div>
+
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chatInput" placeholder="Scrivi come ti senti..." rows="1"
+      onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendChat()}"
+      oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
+    <button class="chat-send" onclick="sendChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN: SPESA -->
+<div class="screen" id="screen-spesa">
+  <div style="padding: 16px 16px 8px; display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:2px;">Lista completa per 7 giorni</div>
+      <div style="font-size:13px; color:var(--sage);" id="spesaCount"></div>
+    </div>
+    <button class="btn-secondary" onclick="resetSpesa()">↺ Azzera spunte</button>
+  </div>
+  <div id="spesaContent" style="padding: 0 16px 100px;"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('home', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    Home
+  </button>
+  <button class="nav-btn" onclick="showScreen('dieta', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+      <line x1="9" y1="12" x2="15" y2="12"/>
+      <line x1="9" y1="16" x2="13" y2="16"/>
+    </svg>
+    Dieta
+  </button>
+  <button class="nav-btn" onclick="showScreen('foto', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    Foto
+  </button>
+  <button class="nav-btn" onclick="showScreen('calorie', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    Calorie
+  </button>
+  <button class="nav-btn" onclick="showScreen('coach', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </svg>
+    Coach
+  </button>
+  <button class="nav-btn" onclick="showScreen('spesa', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
+    </svg>
+    Spesa
+  </button>
+</nav>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────
+let pesiLog = JSON.parse(localStorage.getItem('erika_pesi') || '[]');
+let uploadedImageBase64 = null;
+let lastAnalyzedKcal = 0;
+let lastAnalyzedName = '';
+
+const START_WEIGHT = 73;
+const GOAL_WEIGHT = 65;
+const KCAL_TARGET = 1450;
+
+// ─── DIETA DATA ───────────────────────────────────────────────────
+let currentWeek = 0;
+let currentDay = 0;
+
+// Pasti fissi (colazione, spuntino, pranzo) — variano per giorno ma non per settimana
+const PRANZI = [
+  { nome: 'Salmone & Avocado', desc: 'Salmone affumicato, avocado, capperi, limone + crackers di riso.', tags: ['s.g.','omega-3'], kcal: 420, ricetta: { ingredienti: ['100g salmone affumicato','½ avocado','capperi','succo di limone','crackers di riso','erba cipollina'], passi: ['Disponi il salmone sul piatto.','Affetta l\'avocado e aggiungi.','Aggiungi capperi e spremi il limone.','Guarnisci con erba cipollina.','Servi con crackers di riso.'] } },
+  { nome: 'Feta & Cetrioli', desc: 'Feta light, cetrioli, olive nere, origano, olio EVO.', tags: ['s.g.','veloce'], kcal: 370, ricetta: { ingredienti: ['80g feta light','1 cetriolo','olive nere','origano','olio EVO','pepe'], passi: ['Taglia il cetriolo a rondelle.','Sbriciola la feta sopra.','Aggiungi olive e origano.','Condisci con olio e pepe.'] } },
+  { nome: 'Caesar Salad leggera', desc: 'Romana, pollo grigliato, parmigiano, dressing yogurt-limone. Senza crostini.', tags: ['s.g.','proteico'], kcal: 410, ricetta: { ingredienti: ['100g petto di pollo','insalata romana','20g parmigiano','yogurt greco light','limone','senape'], passi: ['Griglia il pollo con poco olio.','Prepara dressing: yogurt+limone+senape.','Taglia l\'insalata.','Assembla con il pollo a fette e parmigiano.','Condisci con il dressing.'] } },
+  { nome: 'Lenticchie, feta e pomodori', desc: 'Lenticchie fredde, feta light, pomodorini, cipolla rossa, aceto balsamico.', tags: ['s.g.','fibre'], kcal: 430, ricetta: { ingredienti: ['150g lenticchie cotte','60g feta','100g pomodorini','¼ cipolla rossa','olio EVO','aceto balsamico','basilico'], passi: ['Sciacqua le lenticchie.','Taglia pomodorini e cipolla.','Sbriciola la feta.','Unisci tutto e condisci con olio e aceto.','Guarnisci con basilico.'] } },
+  { nome: 'Insalata di tonno', desc: 'Tonno al naturale, fagiolini, pomodori, olive taggiasche, limone.', tags: ['s.g.','proteico'], kcal: 390, ricetta: { ingredienti: ['120g tonno al naturale','100g fagiolini','1 pomodoro','olive taggiasche','olio EVO','limone'], passi: ['Lessa i fagiolini 8 min, raffredda.','Taglia il pomodoro a spicchi.','Sgocciola il tonno.','Unisci e condisci con olio e limone.','Aggiungi le olive.'] } },
+  { nome: 'Bruschettona pomodori & burrata', desc: 'Pane s.g. tostato, pomodori ramati, burrata (moderazione), basilico, olio EVO.', tags: ['vegetariano'], kcal: 450, ricetta: { ingredienti: ['1 fetta pane s.g.','2 pomodori ramati','50g burrata','basilico','olio EVO','aglio'], passi: ['Tosta il pane.','Strofina l\'aglio sulla superficie.','Condisci i pomodori a cubetti con olio e sale.','Adagia i pomodori sul pane.','Aggiungi la burrata e il basilico.'] } },
+  { nome: 'Quinoa con avocado e gamberi', desc: 'Quinoa fredda, avocado, gamberi, pomodorini, salsa yogurt-limone.', tags: ['s.g.','proteico'], kcal: 440, ricetta: { ingredienti: ['80g quinoa','100g gamberi','½ avocado','100g pomodorini','yogurt greco light','limone','prezzemolo'], passi: ['Cuoci la quinoa, fai raffreddare.','Cuoci i gamberi in padella con aglio 3 min.','Prepara salsa: yogurt+limone+prezzemolo.','Assembla tutto.','Condisci con la salsa.'] } },
+];
+
+// 4 settimane × 7 giorni — solo le CENE variano
+const SETTIMANE = [
+  { label: 'Settimana 1', giorni: [
+    { giorno:'Lun', pranzoIdx:0, cena:{ nome:'Peperoni ripieni di macinato', desc:'Peperoni colorati farciti con macinato di tacchino, pomodoro e spezie mediterranee, al forno.', tags:['s.g.','proteico'], kcal:520, ricetta:{ ingredienti:['2 peperoni medi','200g macinato tacchino','1 pomodoro','½ cipolla','aglio, origano, prezzemolo','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Taglia i peperoni a metà, togli i semi.','Soffriggi cipolla e aglio.','Aggiungi macinato, rosola.','Unisci pomodoro e spezie, cuoci 10 min.','Farcisci e inforna 25-30 min.'] } } },
+    { giorno:'Mar', pranzoIdx:1, cena:{ nome:'Quinoa con gamberoni e zucchine', desc:'Quinoa con zucchine grigliate, gamberoni saltati aglio e peperoncino, limone.', tags:['s.g.','proteico'], kcal:490, ricetta:{ ingredienti:['80g quinoa','150g gamberoni','2 zucchine','aglio, peperoncino','olio EVO','limone','prezzemolo'], passi:['Cuoci la quinoa.','Griglia le zucchine.','Salta i gamberoni con aglio e peperoncino 3-4 min.','Unisci tutto.','Servi con limone e prezzemolo.'] } } },
+    { giorno:'Mer', pranzoIdx:2, cena:{ nome:'Pasta s.g. al pesto di rucola e salmone', desc:'Pasta di lenticchie rosse, pesto rucola-noci, salmone al vapore.', tags:['s.g.','omega-3'], kcal:510, ricetta:{ ingredienti:['80g pasta lenticchie rosse','100g salmone fresco','40g rucola','20g noci','aglio','olio EVO','sale'], passi:['Cuoci la pasta al dente.','Frulla rucola, noci, aglio e olio.','Cuoci il salmone a vapore 8-10 min, sminuzza.','Condisci la pasta con il pesto.','Aggiungi il salmone sopra.'] } } },
+    { giorno:'Gio', pranzoIdx:3, cena:{ nome:'Pollo al limone e verdure al forno', desc:'Cosce di pollo marinate al limone e rosmarino, patate dolci e carote al forno.', tags:['s.g.','proteico'], kcal:500, ricetta:{ ingredienti:['200g cosce di pollo','1 patata dolce','2 carote','rosmarino, aglio','succo di 1 limone','olio EVO','sale, pepe'], passi:['Marina il pollo con limone, rosmarino, aglio, olio 30 min.','Preriscalda forno 200°C.','Taglia patata dolce e carote a cubetti.','Metti tutto in teglia.','Inforna 35-40 min, gira a metà.'] } } },
+    { giorno:'Ven', pranzoIdx:4, cena:{ nome:'Parmigiana di zucchine light', desc:'Zucchine grigliate a strati con passata, mozzarella di bufala light e basilico.', tags:['s.g.','vegetariano'], kcal:530, ricetta:{ ingredienti:['3 zucchine grandi','200g passata pomodoro','80g mozzarella bufala light','basilico','aglio','olio EVO'], passi:['Griglia le zucchine a fette.','Scalda la passata con aglio e basilico 10 min.','Strati in pirofila: salsa, zucchine, mozzarella.','Ripeti.','Inforna 180°C per 20 min.'] } } },
+    { giorno:'Sab', pranzoIdx:5, cena:{ nome:'Salmone al cartoccio con asparagi', desc:'Filetto di salmone al cartoccio, asparagi, limone, capperi e aneto.', tags:['s.g.','omega-3'], kcal:560, ricetta:{ ingredienti:['200g filetto salmone','200g asparagi','limone','capperi','aneto fresco','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Stendi carta forno, posa il salmone.','Aggiungi asparagi, limone, capperi, aneto e olio.','Chiudi il cartoccio.','Inforna 18-20 min.'] } } },
+    { giorno:'Dom', pranzoIdx:6, cena:{ nome:'Minestrone detox con uova in camicia', desc:'Minestrone leggero di verdure di stagione con 2 uova in camicia.', tags:['s.g.','vegetariano'], kcal:480, ricetta:{ ingredienti:['1 zucchina','1 carota','1 gambo sedano','1 pomodoro','100g spinaci','brodo vegetale','2 uova freschissime','olio EVO'], passi:['Taglia le verdure a cubetti.','Fai appassire con poco olio 5 min.','Copri con brodo e cuoci 20 min.','Porta acqua a ebollizione con aceto per le uova.','Crea un vortice e immergi le uova, cuoci 3 min.','Servi il minestrone con le uova sopra.'] } } },
+  ]},
+  { label: 'Settimana 2', giorni: [
+    { giorno:'Lun', pranzoIdx:1, cena:{ nome:'Tacchino in umido con melanzane', desc:'Bocconcini di tacchino in umido con melanzane, pomodorini e olive verdi.', tags:['s.g.','proteico'], kcal:500, ricetta:{ ingredienti:['200g tacchino a bocconcini','1 melanzana','150g pomodorini','olive verdi','aglio, origano','olio EVO','sale, pepe'], passi:['Rosola il tacchino con aglio e olio.','Aggiungi la melanzana a cubetti, cuoci 5 min.','Unisci i pomodorini, olive e origano.','Copri e cuoci a fuoco basso 20 min.','Aggiusta di sale e servi.'] } } },
+    { giorno:'Mar', pranzoIdx:2, cena:{ nome:'Insalata di riso basmati con tonno e verdure', desc:'Riso basmati freddo, tonno al naturale, zucchine grigliate, pomodorini, basilico.', tags:['s.g.','proteico'], kcal:490, ricetta:{ ingredienti:['80g riso basmati','120g tonno al naturale','1 zucchina','100g pomodorini','basilico','olio EVO','limone'], passi:['Cuoci il riso basmati, raffredda.','Griglia la zucchina a rondelle.','Sgocciola il tonno.','Unisci tutto con i pomodorini.','Condisci con olio e limone, guarnisci con basilico.'] } } },
+    { giorno:'Mer', pranzoIdx:3, cena:{ nome:'Pasta s.g. alle vongole e zucchine', desc:'Pasta di mais al dente, vongole fresche, zucchine, aglio, prezzemolo abbondante.', tags:['s.g.','pesce'], kcal:520, ricetta:{ ingredienti:['80g pasta di mais','200g vongole','1 zucchina','2 spicchi aglio','peperoncino','olio EVO','prezzemolo','sale'], passi:['Fai spurgare le vongole in acqua salata 1h.','Cuoci la pasta al dente.','Soffriggi aglio e peperoncino.','Aggiungi le vongole, copri finché si aprono.','Unisci la zucchina saltata e la pasta.','Prezzemolo abbondante.'] } } },
+    { giorno:'Gio', pranzoIdx:4, cena:{ nome:'Filetto di branzino con patate dolci e rosmarino', desc:'Branzino al forno su letto di patate dolci, rosmarino, limone e olio EVO.', tags:['s.g.','pesce'], kcal:510, ricetta:{ ingredienti:['200g filetto branzino','1 patata dolce','rosmarino fresco','1 limone','olio EVO','sale, pepe','timo'], passi:['Preriscalda forno 200°C.','Taglia la patata dolce a rondelle, condisci con olio e rosmarino.','Inforna le patate 15 min.','Posa il branzino sopra, limone, timo, olio.','Inforna altri 15-18 min.'] } } },
+    { giorno:'Ven', pranzoIdx:5, cena:{ nome:'Quinoa con pollo alle erbe e spinaci saltati', desc:'Quinoa tricolore, petto di pollo alle erbe aromatiche, spinaci saltati con aglio.', tags:['s.g.','proteico'], kcal:495, ricetta:{ ingredienti:['80g quinoa tricolore','150g petto di pollo','200g spinaci freschi','rosmarino, timo, aglio','olio EVO','sale, pepe','limone'], passi:['Cuoci la quinoa.','Marina il pollo con erbe, olio e limone.','Griglia il pollo 5-6 min per lato.','Salta gli spinaci con aglio e olio 3 min.','Servi quinoa, pollo a fette e spinaci.'] } } },
+    { giorno:'Sab', pranzoIdx:6, cena:{ nome:'Coda di rospo al forno con verdure mediterranee', desc:'Coda di rospo al forno con pomodorini, capperi, olive nere, origano e olio EVO.', tags:['s.g.','pesce'], kcal:480, ricetta:{ ingredienti:['200g coda di rospo','150g pomodorini','olive nere','capperi','origano','olio EVO','prezzemolo','sale'], passi:['Preriscalda forno 190°C.','Disponi il pesce in teglia.','Aggiungi pomodorini, olive, capperi e origano.','Irrora con olio EVO.','Inforna 20-22 min.','Prezzemolo fresco al momento di servire.'] } } },
+    { giorno:'Dom', pranzoIdx:0, cena:{ nome:'Zuppa di legumi con verdure e crostini s.g.', desc:'Zuppa ricca di ceci, carote, sedano, rosmarino. Crostini di pane senza glutine.', tags:['s.g.','vegetariano'], kcal:460, ricetta:{ ingredienti:['150g ceci cotti','1 carota','1 gambo sedano','½ cipolla','rosmarino','brodo vegetale','olio EVO','pane s.g.'], passi:['Soffriggi cipolla, carota e sedano.','Aggiungi i ceci e il brodo.','Cuoci 20 min, frulla metà della zuppa per renderla cremosa.','Aggiungi rosmarino e cuoci altri 5 min.','Tosta il pane s.g. e servi a parte.'] } } },
+  ]},
+  { label: 'Settimana 3', giorni: [
+    { giorno:'Lun', pranzoIdx:2, cena:{ nome:'Pollo tikka masala light', desc:'Pollo marinato allo yogurt e spezie, cotto in salsa di pomodoro speziata, servito con quinoa.', tags:['s.g.','proteico'], kcal:530, ricetta:{ ingredienti:['200g petto pollo','80g quinoa','150g passata pomodoro','yogurt greco','curcuma, cumino, paprika','aglio, zenzero','olio EVO'], passi:['Marina il pollo con yogurt e spezie 30 min.','Cuoci il pollo in padella.','In altra padella soffriggi aglio, zenzero e spezie.','Aggiungi la passata, cuoci 10 min.','Unisci il pollo, cuoci 5 min.','Servi con quinoa.'] } } },
+    { giorno:'Mar', pranzoIdx:3, cena:{ nome:'Pasta s.g. con crema di zucca e pancetta croccante', desc:'Pasta di riso con crema di zucca, pancetta di tacchino croccante e salvia fritta.', tags:['s.g.','comfort'], kcal:525, ricetta:{ ingredienti:['80g pasta di riso','200g zucca','50g pancetta tacchino','4 foglie salvia','½ cipolla','brodo vegetale','olio EVO','noce moscata'], passi:['Cuoci la zucca con cipolla e brodo finché morbida.','Frulla fino a crema liscia, aggiusta di sale e noce moscata.','Rosola la pancetta finché croccante.','Cuoci la pasta al dente.','Condisci con la crema di zucca.','Guarnisci con pancetta e salvia.'] } } },
+    { giorno:'Mer', pranzoIdx:4, cena:{ nome:'Merluzzo al vapore con salsa verde e riso', desc:'Filetto di merluzzo al vapore, salsa verde prezzemolo-capperi-limone, riso basmati.', tags:['s.g.','pesce'], kcal:480, ricetta:{ ingredienti:['200g filetto merluzzo','80g riso basmati','prezzemolo abbondante','capperi','aglio','olio EVO','limone'], passi:['Cuoci il riso basmati.','Cuoci il merluzzo a vapore 8-10 min.','Frulla prezzemolo, capperi, aglio, olio e limone per la salsa.','Servi il merluzzo sul riso.','Versa la salsa verde sopra.'] } } },
+    { giorno:'Gio', pranzoIdx:5, cena:{ nome:'Hamburger di salmone con insalata di cavolo', desc:'Burger di salmone fatto in casa, insalata di cavolo cappuccio con sesamo e salsa allo yogurt.', tags:['s.g.','omega-3'], kcal:510, ricetta:{ ingredienti:['200g salmone fresco','¼ cavolo cappuccio','sesamo tostato','yogurt greco light','limone, senape','erba cipollina','olio EVO'], passi:['Trita il salmone, forma due burger.','Cuoci in padella 3-4 min per lato.','Affetta finemente il cavolo.','Prepara la salsa: yogurt+limone+senape.','Condisci il cavolo con olio e sesamo.','Servi il burger sull\'insalata con la salsa.'] } } },
+    { giorno:'Ven', pranzoIdx:6, cena:{ nome:'Involtini di melanzane con ricotta light e pomodoro', desc:'Melanzane grigliate farcite con ricotta light, erbe aromatiche, al forno con passata.', tags:['s.g.','vegetariano'], kcal:460, ricetta:{ ingredienti:['2 melanzane','150g ricotta light','200g passata pomodoro','basilico, menta','aglio','olio EVO','sale, pepe'], passi:['Griglia le fette di melanzana.','Mescola ricotta con basilico, menta, sale e pepe.','Spalma la ricotta sulle melanzane e arrotola.','Disponi in pirofila con la passata.','Inforna 180°C per 20 min.'] } } },
+    { giorno:'Sab', pranzoIdx:0, cena:{ nome:'Tagliata di manzo con rucola e grana', desc:'Tagliata di manzo magro, rucola fresca, grana a scaglie, limone e olio EVO.', tags:['s.g.','proteico'], kcal:550, ricetta:{ ingredienti:['200g controfiletto manzo','60g rucola','20g grana padano a scaglie','olio EVO','succo di limone','sale grosso','pepe'], passi:['Scalda la griglia al massimo.','Cuoci il manzo 2-3 min per lato (cottura al sangue/media).','Lascia riposare 3 min.','Affetta in diagonale.','Servi su un letto di rucola.','Condisci con olio, limone e scaglie di grana.'] } } },
+    { giorno:'Dom', pranzoIdx:1, cena:{ nome:'Vellutata di zucchine e gamberetti', desc:'Vellutata cremosa di zucchine con gamberetti saltati all\'aglio e crostini di riso.', tags:['s.g.','leggero'], kcal:430, ricetta:{ ingredienti:['3 zucchine','100g gamberetti','½ cipolla','brodo vegetale','olio EVO','aglio','crackers di riso','prezzemolo'], passi:['Soffriggi cipolla e zucchine con olio.','Copri con brodo e cuoci 15 min.','Frulla fino a vellutata liscia.','Salta i gamberetti con aglio e olio 2-3 min.','Servi la vellutata con i gamberetti sopra.','Prezzemolo e crackers di riso a parte.'] } } },
+  ]},
+  { label: 'Settimana 4', giorni: [
+    { giorno:'Lun', pranzoIdx:3, cena:{ nome:'Pollo al curry verde con quinoa', desc:'Bocconcini di pollo in curry verde leggero con latte di cocco light, zucchine, quinoa.', tags:['s.g.','esotico'], kcal:520, ricetta:{ ingredienti:['200g petto pollo','80g quinoa','1 zucchina','100ml latte cocco light','1 cucchiaio curry verde','aglio, zenzero','olio EVO','coriandolo fresco'], passi:['Cuoci la quinoa.','Rosola il pollo con aglio e zenzero.','Aggiungi curry verde e mescola.','Unisci latte di cocco e zucchina a cubetti.','Cuoci 15 min a fuoco medio.','Servi con quinoa e coriandolo fresco.'] } } },
+    { giorno:'Mar', pranzoIdx:4, cena:{ nome:'Pasta s.g. alla Norma light', desc:'Pasta di lenticchie, melanzane al forno, passata di pomodoro aromatica, ricotta salata.', tags:['s.g.','vegetariano'], kcal:510, ricetta:{ ingredienti:['80g pasta lenticchie','1 melanzana','200g passata pomodoro','30g ricotta salata','basilico','aglio','olio EVO','sale'], passi:['Taglia la melanzana a cubetti e arrostisci in forno 200°C per 20 min.','Prepara la salsa con passata, aglio e basilico.','Cuoci la pasta al dente.','Unisci pasta, salsa e melanzane.','Grattugia la ricotta salata sopra.'] } } },
+    { giorno:'Mer', pranzoIdx:5, cena:{ nome:'Orata al forno con finocchi e olive', desc:'Orata intera al forno con finocchi, olive nere, pomodorini, vino bianco e erbe.', tags:['s.g.','pesce'], kcal:490, ricetta:{ ingredienti:['1 orata da 300g','1 finocchio','100g pomodorini','olive nere','50ml vino bianco s.g.','prezzemolo, origano','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Affetta il finocchio e disponi in teglia.','Posa l\'orata sopra con pomodorini e olive.','Irrora con vino bianco e olio.','Aggiungi erbe, sale e pepe.','Inforna 25-30 min.'] } } },
+    { giorno:'Gio', pranzoIdx:6, cena:{ nome:'Insalata di riso venere con gamberi e avocado', desc:'Riso venere freddo, gamberi cotti, avocado, mango, cetriolo, lime e zenzero.', tags:['s.g.','fresco'], kcal:500, ricetta:{ ingredienti:['80g riso venere','150g gamberi','½ avocado','½ mango','1 cetriolo','succo di lime','zenzero grattugiato','olio EVO'], passi:['Cuoci il riso venere, raffredda bene.','Cuoci i gamberi in padella con poco olio e sale.','Taglia avocado, mango e cetriolo a cubetti.','Mescola tutto con il riso.','Condisci con lime, zenzero e olio EVO.'] } } },
+    { giorno:'Ven', pranzoIdx:0, cena:{ nome:'Polpette di tacchino al sugo con zucchine trifolate', desc:'Polpette di macinato di tacchino in salsa di pomodoro fresca, zucchine trifolate.', tags:['s.g.','proteico'], kcal:515, ricetta:{ ingredienti:['200g macinato tacchino','1 uovo','prezzemolo, aglio','200g passata pomodoro','2 zucchine','olio EVO','sale, pepe'], passi:['Mescola macinato, uovo, prezzemolo, aglio, sale e pepe.','Forma le polpette.','Rosola in padella con poco olio.','Aggiungi la passata e cuoci 15 min.','In altra padella, trifola le zucchine con aglio e olio.','Servi polpette con il sugo e le zucchine.'] } } },
+    { giorno:'Sab', pranzoIdx:1, cena:{ nome:'Branzino in crosta di erbe con purè di cavolfiore', desc:'Filetto di branzino in crosta di erbe al forno, purè leggero di cavolfiore con olio EVO.', tags:['s.g.','pesce'], kcal:495, ricetta:{ ingredienti:['200g filetto branzino','½ cavolfiore','prezzemolo, timo, rosmarino','pangrattato s.g.','olio EVO','aglio','latte vegetale','sale, pepe'], passi:['Cuoci il cavolfiore a vapore finché morbido.','Frulla con olio, latte vegetale, sale — purè.','Mescola erbe tritate con pangrattato s.g. e olio.','Ricopri il branzino con la crosta di erbe.','Inforna 190°C per 15-18 min.','Servi con il purè di cavolfiore.'] } } },
+    { giorno:'Dom', pranzoIdx:2, cena:{ nome:'Risotto di cavolfiore con gamberoni e zafferano', desc:'\"Risotto\" di cavolfiore grattugiato al posto del riso, con gamberoni e zafferano.', tags:['s.g.','leggero'], kcal:450, ricetta:{ ingredienti:['1 cavolfiore grande','150g gamberoni','1 bustina zafferano','½ cipolla','brodo vegetale','olio EVO','prezzemolo','sale, pepe'], passi:['Grattugia il cavolfiore finemente (diventa come riso).','Soffriggi la cipolla, aggiungi il cavolfiore.','Aggiungi brodo gradualmente come un risotto, cuoci 10-12 min.','Unisci lo zafferano.','In padella salta i gamberoni con olio e aglio.','Servi il cavolfiore con i gamberoni sopra.'] } } },
+  ]},
+];
+
+const COLAZIONI = [
+  { nome:'Caffè latte + Magretti Galbusera', desc:'Caffè latte 150ml (latte p. scremato) + 1 pacchettino Biscotti Magretti Galbusera (4 biscotti, 25g).', tags:['s.g.'], kcal:165 },
+  { nome:'Caffè latte + Magretti Galbusera', desc:'Caffè latte 150ml + 1 pacchettino Biscotti Magretti Galbusera — la colazione fissa che ami ☕', tags:['s.g.'], kcal:165 },
+];
+const SPUNTINI_OPTIONS = [
+  { nome:'Frutta di stagione', desc:'Una mela, pera o arancia — sbucciata per il Crohn.', tags:['leggero'], kcal:80 },
+  { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero, perfetto a metà mattina.', tags:['proteico'], kcal:45 },
+];
+
+function getDayMenu(weekIdx, dayIdx) {
+  const g = SETTIMANE[weekIdx].giorni[dayIdx];
+  const col = COLAZIONI[dayIdx % 2];
+  const pranzo = PRANZI[g.pranzoIdx];
+  const pasti = [
+    { tipo:'Colazione', icon:'☕', ...col, ricetta:null },
+    { tipo:'Spuntino', icon:'🍎', isSnack:true, options: SPUNTINI_OPTIONS },
+    { tipo:'Pranzo', icon:'🥗', ...pranzo },
+    { tipo:'Cena', icon:'🍽️', ...g.cena },
+  ];
+  // Apply any saved menu edits
+  const edits = JSON.parse(localStorage.getItem('erika_menu_edits') || '{}');
+  return pasti.map(p => {
+    if (p.isSnack) return p; // snack options don't get edited
+    const key = `${weekIdx}_${dayIdx}_${p.tipo}`;
+    return edits[key] ? { ...p, ...edits[key] } : p;
+  });
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  const titles = { home: 'Buongiorno, Erika ✦', dieta: 'Piano alimentare', foto: 'Analisi pasto', coach: 'La tua Coach', spesa: '🛒 Lista della spesa', calorie: '🔥 Diario calorie' };
+  document.getElementById('screenTitle').textContent = titles[name];
+
+  const chatBar = document.querySelector('.chat-input-bar');
+  if (name === 'coach') chatBar.classList.add('visible');
+  else chatBar.classList.remove('visible');
+
+  if (name === 'dieta') renderDieta();
+  if (name === 'home') updateProgress();
+  if (name === 'spesa') renderSpesa();
+  if (name === 'calorie') renderCalorieDiary();
+}
+
+// ─── MOTIVATION ───────────────────────────────────────────────────
+async function loadMotivation() {
+  const el = document.getElementById('motivQuote');
+  el.textContent = '...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Sei un coach di benessere personale per Erika, che vuole perdere 8 kg (da 73 a 65 kg), pratica padel 3 ore a settimana e ha il morbo di Crohn. 
+Genera UN messaggio motivazionale breve (massimo 2 frasi), caldo, personale, in italiano. Può essere ispirazionale, pratico o simpatico. Varia ogni volta. Non iniziare con "Ciao" o "Erika". Solo il messaggio, niente altro.`
+        }]
+      })
+    });
+    const data = await res.json();
+    el.textContent = data.content[0].text;
+  } catch {
+    const fallback = [
+      'Ogni scelta sana è un voto per la persona che vuoi diventare.',
+      'Il padel brucia le calorie, la determinazione brucia i limiti.',
+      'Non perfetto, ma costante. È tutto ciò che serve.',
+      'Il tuo corpo ti ringrazia per ogni pasto equilibrato.',
+      'Meno 8 kg inizia con una sola giornata ben vissuta.'
+    ];
+    el.textContent = fallback[Math.floor(Math.random() * fallback.length)];
+  }
+}
+
+// ─── PROGRESS ─────────────────────────────────────────────────────
+function updateProgress() {
+  const current = pesiLog.length > 0 ? pesiLog[pesiLog.length - 1].peso : START_WEIGHT;
+  const lost = START_WEIGHT - current;
+  const total = START_WEIGHT - GOAL_WEIGHT;
+  const pct = Math.max(0, Math.min(100, (lost / total) * 100));
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressKg').innerHTML = `${current} <span>kg attuali</span>`;
+  document.getElementById('progressPct').textContent = Math.round(pct) + '% completato';
+
+  // Milestones
+  const milestones = [71, 69, 67, 65];
+  milestones.forEach((m, i) => {
+    const el = document.getElementById('m' + (i + 1));
+    if (current <= m) el.classList.add('reached');
+    else el.classList.remove('reached');
+  });
+
+  // Render history
+  renderPesoHistory();
+}
+
+// ─── PESO ─────────────────────────────────────────────────────────
+function savePeso() {
+  const val = parseFloat(document.getElementById('pesoInput').value);
+  if (!val || val < 40 || val > 200) { showToast('Inserisci un peso valido'); return; }
+
+  const today = new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+  pesiLog.push({ data: today, peso: val });
+  localStorage.setItem('erika_pesi', JSON.stringify(pesiLog));
+  document.getElementById('pesoInput').value = '';
+  updateProgress();
+  showToast('✓ Peso salvato!');
+}
+
+function renderPesoHistory() {
+  const el = document.getElementById('pesoHistory');
+  if (pesiLog.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted); font-size:13px;">Nessun peso registrato ancora.</div>';
+    return;
+  }
+  const recent = [...pesiLog].reverse().slice(0, 8);
+  el.innerHTML = recent.map((r, i) => {
+    const prev = pesiLog[pesiLog.length - 1 - i - 1];
+    let deltaHtml = '';
+    if (prev) {
+      const diff = r.peso - prev.peso;
+      const sign = diff > 0 ? '+' : '';
+      const cls = diff < 0 ? 'delta-down' : diff > 0 ? 'delta-up' : 'delta-same';
+      deltaHtml = `<span class="peso-delta ${cls}">${sign}${diff.toFixed(1)} kg</span>`;
+    }
+    return `<div class="peso-row">
+      <span class="peso-date">${r.data}</span>
+      <span class="peso-val">${r.peso} kg</span>
+      ${deltaHtml}
+    </div>`;
+  }).join('');
+}
+
+// ─── DIETA ───────────────────────────────────────────────────────
+function renderDieta() {
+  // Week selector
+  const tabsEl = document.getElementById('dayTabs');
+  const days = SETTIMANE[currentWeek].giorni;
+  tabsEl.innerHTML = days.map((d, i) =>
+    `<button class="day-tab ${i === currentDay ? 'active' : ''}" onclick="selectDay(${i})">${d.giorno}</button>`
+  ).join('');
+
+  // Week switcher (inject before tabs if not already present)
+  let weekBar = document.getElementById('weekBar');
+  if (!weekBar) {
+    weekBar = document.createElement('div');
+    weekBar.id = 'weekBar';
+    weekBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px;';
+    tabsEl.parentNode.insertBefore(weekBar, tabsEl);
+  }
+  weekBar.innerHTML = `
+    <button onclick="changeWeek(-1)" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--sage);padding:4px 8px;" ${currentWeek===0?'disabled style="opacity:0.3"':''}>‹</button>
+    <span style="font-size:13px;font-weight:500;color:var(--charcoal);">${SETTIMANE[currentWeek].label}</span>
+    <button onclick="changeWeek(1)" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--sage);padding:4px 8px;" ${currentWeek===3?'disabled style="opacity:0.3"':''}>›</button>
+  `;
+
+  renderDay();
+}
+
+function changeWeek(dir) {
+  currentWeek = Math.max(0, Math.min(3, currentWeek + dir));
+  currentDay = 0;
+  renderDieta();
+}
+
+function selectDay(i) {
+  currentDay = i;
+  document.querySelectorAll('.day-tab').forEach((t, j) => t.classList.toggle('active', j === i));
+  renderDay();
+}
+
+function renderDay() {
+  const pasti = getDayMenu(currentWeek, currentDay);
+  const todayKey_ = todayKey();
+  const log = loadKcalLog();
+  const todayMeals = log[todayKey_] || [];
+
+  // Total kcal: colazione + pranzo + cena + whichever snack was logged
+  const snackLogged = todayMeals.find(m => m.fonte && m.fonte.startsWith('dieta_Spuntino'));
+  const nonSnackKcal = pasti.filter(p => !p.isSnack).reduce((s,p) => s + p.kcal, 0);
+  const totalKcal = nonSnackKcal + (snackLogged ? snackLogged.kcal : 0);
+
+  document.getElementById('dietaContent').innerHTML = `
+    <div style="padding: 8px 16px 4px; font-size:12px; color:var(--muted);">
+      Totale giornaliero stimato: <strong style="color:var(--sage)">${totalKcal} kcal</strong>
+    </div>
+    ${pasti.map((p, pi) => {
+      if (p.isSnack) {
+        // Render two options side by side
+        return `
+        <div class="meal-block">
+          <div class="meal-header">
+            <div class="meal-icon" style="background:var(--sage-pale)">🍎</div>
+            <div><div class="meal-title">Spuntino</div><div class="meal-kcal">scegli un'opzione</div></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            ${p.options.map((opt, oi) => {
+              const fonte = `dieta_Spuntino_${oi}`;
+              const logged = todayMeals.some(m => m.fonte === fonte);
+              return `<div class="snack-option ${logged ? 'snack-logged' : ''}">
+                <div class="snack-icon">${oi === 0 ? '🍎' : '🥛'}</div>
+                <div class="snack-name">${opt.nome}</div>
+                <div class="snack-kcal">${opt.kcal} kcal</div>
+                <div class="snack-desc">${opt.desc}</div>
+                <button class="meal-check-btn ${logged ? 'logged' : ''}" style="width:100%;margin-top:8px;"
+                  onclick="toggleSnackLog(${oi},'${opt.nome}',${opt.kcal},this)">
+                  ${logged ? '✓ Mangiato' : '+ Segna'}
+                </button>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }
+
+      const alreadyLogged = todayMeals.some(m => m.fonte === `dieta_${p.tipo}`);
+      return `
+      <div class="meal-block">
+        <div class="meal-header">
+          <div class="meal-icon" style="background:var(--sage-pale)">${p.icon}</div>
+          <div style="flex:1;">
+            <div class="meal-title">${p.tipo}</div>
+            <div class="meal-kcal">~${p.kcal} kcal</div>
+          </div>
+          <button class="meal-check-btn ${alreadyLogged ? 'logged' : ''}"
+            onclick="toggleMealLog(${currentWeek},${currentDay},${pi},'${p.tipo}',${p.kcal},'${p.nome.replace(/'/g,'')}',this)">
+            ${alreadyLogged ? '✓ Mangiato' : '+ Segna'}
+          </button>
+        </div>
+        <div class="meal-card">
+          <div class="meal-name">${p.nome}</div>
+          <div class="meal-desc">${p.desc}</div>
+          <div class="meal-tags">${p.tags.map(t => `<span class="tag ${t==='s.g.'?'gluten':''}">${t}</span>`).join('')}</div>
+          ${p.ricetta ? `<button class="recipe-btn" onclick="showRecipe(${currentWeek},${currentDay},${pi})">📖 Vedi ricetta completa</button>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function toggleSnackLog(optIdx, nome, kcal, btn) {
+  const key = todayKey();
+  const log = loadKcalLog();
+  if (!log[key]) log[key] = [];
+
+  const fonte = `dieta_Spuntino_${optIdx}`;
+  const otherFonte = `dieta_Spuntino_${optIdx === 0 ? 1 : 0}`;
+
+  const existing = log[key].findIndex(m => m.fonte === fonte);
+
+  if (existing >= 0) {
+    // Deseleziona
+    log[key].splice(existing, 1);
+    btn.textContent = '+ Segna';
+    btn.classList.remove('logged');
+    btn.closest('.snack-option').classList.remove('snack-logged');
+    showToast(`${nome} rimosso dal diario`);
+  } else {
+    // Rimuovi l'altra opzione se era selezionata
+    const otherIdx = log[key].findIndex(m => m.fonte === otherFonte);
+    if (otherIdx >= 0) log[key].splice(otherIdx, 1);
+
+    // Aggiungi questa
+    const now = new Date();
+    const ora = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    log[key].push({ nome, kcal, ora, fonte });
+    showToast(`✓ ${nome} — ${kcal} kcal salvate!`);
+
+    // Refresh per aggiornare visivamente entrambe le opzioni
+    saveKcalLog(log);
+    renderDay();
+    return;
+  }
+  saveKcalLog(log);
+}
+
+function toggleMealLog(weekIdx, dayIdx, pastoIdx, tipo, kcal, nome, btn) {
+  const key = todayKey();
+  const log = loadKcalLog();
+  if (!log[key]) log[key] = [];
+
+  const fonte = `dieta_${tipo}`;
+  const existing = log[key].findIndex(m => m.fonte === fonte);
+
+  if (existing >= 0) {
+    // Rimuovi
+    log[key].splice(existing, 1);
+    btn.textContent = '+ Segna';
+    btn.classList.remove('logged');
+    showToast(`${tipo} rimosso dal diario`);
+  } else {
+    // Aggiungi
+    const now = new Date();
+    const ora = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    log[key].push({ nome, kcal, ora, fonte });
+    btn.textContent = '✓ Mangiato';
+    btn.classList.add('logged');
+    showToast(`✓ ${nome} — ${kcal} kcal salvate!`);
+  }
+  saveKcalLog(log);
+}
+
+function showRecipe(weekIdx, dayIdx, pastoIdx) {
+  const pasti = getDayMenu(weekIdx, dayIdx);
+  const pasto = pasti[pastoIdx];
+  const r = pasto.ricetta;
+  document.getElementById('recipeTitle').textContent = pasto.nome;
+  document.getElementById('recipeContent').innerHTML = `
+    <div class="recipe-section">
+      <h4>Ingredienti</h4>
+      <ul>${r.ingredienti.map(i => `<li>${i}</li>`).join('')}</ul>
+    </div>
+    <div class="recipe-section">
+      <h4>Preparazione</h4>
+      <ol>${r.passi.map(p => `<li>${p}</li>`).join('')}</ol>
+    </div>
+    <div class="recipe-section">
+      <p style="color:var(--muted); font-size:12px;">💚 Crohn-friendly: evita cotture elaborate e grassi in eccesso. Ascolta sempre il tuo corpo.</p>
+    </div>
+  `;
+  document.getElementById('recipeModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('recipeModal').classList.remove('open');
+}
+
+// ─── FOTO ─────────────────────────────────────────────────────────
+function handleFotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedImageBase64 = e.target.result.split(',')[1];
+    document.getElementById('fotoPreview').src = e.target.result;
+    document.getElementById('fotoPreviewWrap').style.display = 'block';
+    document.getElementById('uploadZone').style.display = 'none';
+    document.getElementById('fotoAnalysis').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetFoto() {
+  uploadedImageBase64 = null;
+  document.getElementById('fotoPreviewWrap').style.display = 'none';
+  document.getElementById('uploadZone').style.display = 'block';
+  document.getElementById('fotoAnalysis').innerHTML = '';
+  document.getElementById('foto-input').value = '';
+}
+
+async function analyzeFood() {
+  if (!uploadedImageBase64) return;
+  const el = document.getElementById('fotoAnalysis');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Analisi in corso...</div>';
+  lastAnalyzedKcal = 0;
+  lastAnalyzedName = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: uploadedImageBase64 } },
+            { type: 'text', text: `Sei un nutrizionista AI per Erika (73 kg → obiettivo 65 kg, morbo di Crohn, dieta low-carb, senza glutine e poco lattosio, pratica padel 3h/settimana). Target calorico giornaliero: 1450 kcal.
+
+Analizza questa foto e rispondi SOLO in italiano con questo formato esatto:
+
+KCAL:[numero intero senza testo]
+🍽️ **Cosa vedo:** [descrizione breve]
+🔥 **Calorie stimate:** [numero] kcal circa
+📊 **Macronutrienti:** Proteine: Xg | Carboidrati: Xg | Grassi: Xg
+✅ **Feedback:** [2-3 righe]
+🌙 **Suggerimento cena:** [consiglio]
+💚 **Crohn check:** [breve commento]
+
+La prima riga KCAL:[numero] è obbligatoria e deve essere il primo testo della risposta.` }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content[0].text;
+
+    // Extract kcal
+    const kcalMatch = text.match(/^KCAL:(\d+)/);
+    if (kcalMatch) lastAnalyzedKcal = parseInt(kcalMatch[1]);
+    const cleanText = text.replace(/^KCAL:\d+\n?/, '');
+
+    // Extract meal name from "Cosa vedo"
+    const nameMatch = cleanText.match(/Cosa vedo[:\s]+([^\n<]+)/);
+    lastAnalyzedName = nameMatch ? nameMatch[1].trim().substring(0, 40) : 'Pasto fotografato';
+
+    el.innerHTML = `
+      <div class="ai-response">
+        <div class="ai-label"><div class="ai-dot"></div>Analisi AI</div>
+        <div class="ai-text">${cleanText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+      </div>
+      ${lastAnalyzedKcal > 0 ? `
+      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveKcalFromPhoto()">
+        💾 Salva ${lastAnalyzedKcal} kcal nel diario
+      </button>` : ''}
+    `;
+  } catch (err) {
+    el.innerHTML = `<div class="ai-response"><div class="ai-text" style="color:var(--accent)">Errore nell'analisi. Riprova.</div></div>`;
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── LISTA SPESA SETTIMANALE ───────────────────────────────────────
+let spesaWeek = 0; // sincronizzata con currentWeek
+
+const SPESA_SETTIMANE = [
+  // ── SETTIMANA 1 ──
+  {
+    '🥩 Proteine': [
+      { nome: 'Salmone affumicato', qty: '100g' },
+      { nome: 'Salmone fresco (filetti)', qty: '200g' },
+      { nome: 'Gamberoni', qty: '300g' },
+      { nome: 'Macinato di tacchino', qty: '200g' },
+      { nome: 'Cosce di pollo', qty: '400g' },
+      { nome: 'Tonno al naturale', qty: '1 scatoletta' },
+      { nome: 'Uova', qty: '4' },
+    ],
+    '🧀 Latticini & Formaggi': [
+      { nome: 'Feta light', qty: '120g' },
+      { nome: 'Burrata', qty: '1 (125g)' },
+      { nome: 'Mozzarella di bufala light', qty: '80g' },
+      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
+    ],
+    '🥑 Frutta & Verdura': [
+      { nome: 'Avocado', qty: '2' },
+      { nome: 'Peperoni rossi e gialli', qty: '4' },
+      { nome: 'Zucchine', qty: '5' },
+      { nome: 'Asparagi', qty: '200g' },
+      { nome: 'Pomodori ramati', qty: '3' },
+      { nome: 'Pomodorini', qty: '200g' },
+      { nome: 'Cetrioli', qty: '1' },
+      { nome: 'Insalata romana', qty: '1 cespo' },
+      { nome: 'Spinaci freschi', qty: '100g' },
+      { nome: 'Carote', qty: '2' },
+      { nome: 'Sedano', qty: '1 gambo' },
+      { nome: 'Cipolla bianca', qty: '2' },
+      { nome: 'Patata dolce', qty: '1' },
+      { nome: 'Fagiolini', qty: '100g' },
+      { nome: 'Frutta di stagione', qty: 'q.b.' },
+      { nome: 'Limoni', qty: '4' },
+    ],
+    '🫙 Dispensa': [
+      { nome: 'Quinoa', qty: '160g' },
+      { nome: 'Lenticchie in scatola', qty: '1 barattolo' },
+      { nome: 'Pasta di lenticchie rosse (s.g.)', qty: '80g' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Pane senza glutine', qty: '1 confezione' },
+      { nome: 'Passata di pomodoro', qty: '200g' },
+      { nome: 'Capperi', qty: 'q.b.' },
+      { nome: 'Olive taggiasche', qty: '50g' },
+      { nome: 'Noci', qty: '20g' },
+      { nome: 'Olio EVO', qty: 'q.b.' },
+      { nome: 'Aceto balsamico', qty: 'q.b.' },
+      { nome: 'Senape', qty: 'q.b.' },
+      { nome: 'Brodo vegetale', qty: '500ml' },
+    ],
+    '🌿 Freschi & Aromi': [
+      { nome: 'Aglio', qty: '1 testa' },
+      { nome: 'Basilico fresco', qty: '1 mazzo' },
+      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
+      { nome: 'Rosmarino', qty: '1 rametto' },
+      { nome: 'Aneto fresco', qty: '1 mazzetto' },
+      { nome: 'Erba cipollina', qty: '1 mazzetto' },
+    ],
+    '☕ Colazione & Spuntini': [
+      { nome: 'Caffè', qty: 'q.b.' },
+      { nome: 'Latte parzialmente scremato', qty: '1L' },
+      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
+      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
+      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+      { nome: 'Mandorle', qty: '30g' },
+    ],
+  },
+  // ── SETTIMANA 2 ──
+  {
+    '🥩 Proteine': [
+      { nome: 'Tacchino a bocconcini', qty: '400g' },
+      { nome: 'Tonno al naturale', qty: '2 scatolette' },
+      { nome: 'Vongole fresche', qty: '400g' },
+      { nome: 'Filetto di branzino', qty: '400g' },
+      { nome: 'Coda di rospo', qty: '200g' },
+      { nome: 'Gamberi', qty: '200g' },
+      { nome: 'Uova', qty: '4' },
+    ],
+    '🧀 Latticini & Formaggi': [
+      { nome: 'Feta light', qty: '80g' },
+      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
+      { nome: 'Parmigiano a scaglie', qty: '20g' },
+    ],
+    '🥑 Frutta & Verdura': [
+      { nome: 'Avocado', qty: '1' },
+      { nome: 'Melanzane', qty: '2' },
+      { nome: 'Zucchine', qty: '3' },
+      { nome: 'Pomodorini', qty: '300g' },
+      { nome: 'Insalata romana', qty: '1 cespo' },
+      { nome: 'Spinaci', qty: '100g' },
+      { nome: 'Patata dolce', qty: '2' },
+      { nome: 'Carote', qty: '2' },
+      { nome: 'Finocchio', qty: '1' },
+      { nome: 'Cipolla bianca e rossa', qty: '2' },
+      { nome: 'Cetrioli', qty: '1' },
+      { nome: 'Frutta di stagione', qty: 'q.b.' },
+      { nome: 'Limoni', qty: '4' },
+    ],
+    '🫙 Dispensa': [
+      { nome: 'Riso basmati (s.g.)', qty: '160g' },
+      { nome: 'Pasta di mais (s.g.)', qty: '80g' },
+      { nome: 'Quinoa', qty: '80g' },
+      { nome: 'Ceci in scatola', qty: '1 barattolo' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Pane senza glutine', qty: '1 confezione' },
+      { nome: 'Olive nere', qty: '50g' },
+      { nome: 'Capperi', qty: 'q.b.' },
+      { nome: 'Vino bianco s.g.', qty: '100ml' },
+      { nome: 'Olio EVO', qty: 'q.b.' },
+      { nome: 'Brodo vegetale', qty: '500ml' },
+    ],
+    '🌿 Freschi & Aromi': [
+      { nome: 'Aglio', qty: '1 testa' },
+      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
+      { nome: 'Basilico fresco', qty: '1 mazzo' },
+      { nome: 'Rosmarino', qty: '1 rametto' },
+      { nome: 'Timo fresco', qty: '1 mazzetto' },
+      { nome: 'Origano secco', qty: 'q.b.' },
+    ],
+    '☕ Colazione & Spuntini': [
+      { nome: 'Caffè', qty: 'q.b.' },
+      { nome: 'Latte p. scremato', qty: '1L' },
+      
+      
+      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
+      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
+      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+    ],
+  },
+  // ── SETTIMANA 3 ──
+  {
+    '🥩 Proteine': [
+      { nome: 'Petto di pollo', qty: '400g' },
+      { nome: 'Salmone fresco', qty: '400g' },
+      { nome: 'Filetto di merluzzo', qty: '200g' },
+      { nome: 'Controfiletto di manzo magro', qty: '200g' },
+      { nome: 'Gamberi', qty: '100g' },
+      { nome: 'Uova', qty: '4' },
+    ],
+    '🧀 Latticini & Formaggi': [
+      { nome: 'Yogurt greco light (Biraghi)', qty: '5 vasetti' },
+      { nome: 'Ricotta light', qty: '150g' },
+      { nome: 'Feta light', qty: '80g' },
+      { nome: 'Grana Padano a scaglie', qty: '20g' },
+    ],
+    '🥑 Frutta & Verdura': [
+      { nome: 'Avocado', qty: '1' },
+      { nome: 'Zucchine', qty: '4' },
+      { nome: 'Melanzane', qty: '2' },
+      { nome: 'Pomodorini', qty: '200g' },
+      { nome: 'Cavolo cappuccio', qty: '¼' },
+      { nome: 'Spinaci', qty: '100g' },
+      { nome: 'Rucola', qty: '60g' },
+      { nome: 'Cipolla bianca', qty: '2' },
+      { nome: 'Cetrioli', qty: '1' },
+      { nome: 'Sesamo tostato', qty: '10g' },
+      { nome: 'Frutta di stagione', qty: 'q.b.' },
+      { nome: 'Limoni', qty: '4' },
+    ],
+    '🫙 Dispensa': [
+      { nome: 'Quinoa', qty: '80g' },
+      { nome: 'Pasta di riso (s.g.)', qty: '80g' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Pane senza glutine', qty: '1 confezione' },
+      { nome: 'Passata di pomodoro', qty: '200g' },
+      { nome: 'Curcuma, cumino, paprika', qty: 'q.b.' },
+      { nome: 'Zenzero fresco', qty: '1 pezzetto' },
+      { nome: 'Capperi', qty: 'q.b.' },
+      { nome: 'Olio EVO', qty: 'q.b.' },
+      { nome: 'Senape', qty: 'q.b.' },
+    ],
+    '🌿 Freschi & Aromi': [
+      { nome: 'Aglio', qty: '1 testa' },
+      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
+      { nome: 'Basilico fresco', qty: '1 mazzo' },
+      { nome: 'Menta fresca', qty: '1 mazzetto' },
+      { nome: 'Coriandolo fresco', qty: '1 mazzetto' },
+      { nome: 'Rosmarino', qty: '1 rametto' },
+      { nome: 'Timo fresco', qty: '1 mazzetto' },
+    ],
+    '☕ Colazione & Spuntini': [
+      { nome: 'Caffè', qty: 'q.b.' },
+      { nome: 'Latte p. scremato', qty: '1L' },
+      
+      
+      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
+      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
+      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+      { nome: 'Mandorle', qty: '30g' },
+    ],
+  },
+  // ── SETTIMANA 4 ──
+  {
+    '🥩 Proteine': [
+      { nome: 'Petto di pollo', qty: '200g' },
+      { nome: 'Macinato di tacchino', qty: '200g' },
+      { nome: 'Orata intera', qty: '1 (300g)' },
+      { nome: 'Filetto di branzino', qty: '200g' },
+      { nome: 'Gamberoni', qty: '300g' },
+      { nome: 'Uova', qty: '3' },
+    ],
+    '🧀 Latticini & Formaggi': [
+      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
+      { nome: 'Ricotta salata', qty: '30g' },
+      { nome: 'Latte vegetale (per purè)', qty: '100ml' },
+      { nome: 'Feta light', qty: '80g' },
+    ],
+    '🥑 Frutta & Verdura': [
+      { nome: 'Avocado', qty: '2' },
+      { nome: 'Mango', qty: '1' },
+      { nome: 'Cetriolo', qty: '2' },
+      { nome: 'Melanzane', qty: '1' },
+      { nome: 'Zucchine', qty: '2' },
+      { nome: 'Cavolfiore', qty: '1 grande' },
+      { nome: 'Finocchio', qty: '1' },
+      { nome: 'Pomodorini', qty: '200g' },
+      { nome: 'Cipolla bianca', qty: '2' },
+      { nome: 'Insalata romana', qty: '1 cespo' },
+      { nome: 'Frutta di stagione', qty: 'q.b.' },
+      { nome: 'Limoni + lime', qty: '3+2' },
+    ],
+    '🫙 Dispensa': [
+      { nome: 'Quinoa', qty: '80g' },
+      { nome: 'Riso venere (s.g.)', qty: '80g' },
+      { nome: 'Pasta di lenticchie (s.g.)', qty: '80g' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Passata di pomodoro', qty: '200g' },
+      { nome: 'Pangrattato senza glutine', qty: '30g' },
+      { nome: 'Latte di cocco light', qty: '100ml' },
+      { nome: 'Curry verde in pasta', qty: '1 vasetto' },
+      { nome: 'Zafferano', qty: '1 bustina' },
+      { nome: 'Olive nere', qty: '50g' },
+      { nome: 'Capperi', qty: 'q.b.' },
+      { nome: 'Olio EVO', qty: 'q.b.' },
+      { nome: 'Brodo vegetale', qty: '500ml' },
+    ],
+    '🌿 Freschi & Aromi': [
+      { nome: 'Aglio', qty: '1 testa' },
+      { nome: 'Zenzero fresco', qty: '1 pezzetto' },
+      { nome: 'Coriandolo fresco', qty: '1 mazzetto' },
+      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
+      { nome: 'Timo fresco', qty: '1 mazzetto' },
+      { nome: 'Rosmarino', qty: '1 rametto' },
+      { nome: 'Origano secco', qty: 'q.b.' },
+    ],
+    '☕ Colazione & Spuntini': [
+      { nome: 'Caffè', qty: 'q.b.' },
+      { nome: 'Latte p. scremato', qty: '1L' },
+      
+      
+      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
+      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
+      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+    ],
+  },
+];
+
+let spesaChecked = JSON.parse(localStorage.getItem('erika_spesa_checked') || '{}');
+
+function renderSpesa() {
+  // Sync with diet week
+  spesaWeek = currentWeek;
+  const SPESA = SPESA_SETTIMANE[spesaWeek];
+
+  // Update header
+  document.querySelector('#screen-spesa div div:first-child div:first-child').textContent =
+    `Lista ${SETTIMANE[spesaWeek].label} — da ricette e dieta`;
+
+  // Week switcher for spesa
+  let spesaWeekBar = document.getElementById('spesaWeekBar');
+  if (!spesaWeekBar) {
+    spesaWeekBar = document.createElement('div');
+    spesaWeekBar.id = 'spesaWeekBar';
+    spesaWeekBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px;';
+    const spesaContent = document.getElementById('spesaContent');
+    spesaContent.parentNode.insertBefore(spesaWeekBar, spesaContent);
+  }
+  spesaWeekBar.innerHTML = `
+    <button onclick="changeSpesaWeek(-1)" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--sage);" ${spesaWeek===0?'disabled style="opacity:0.3;cursor:default"':''}>‹ Sett. prec.</button>
+    <span style="font-size:13px;font-weight:500;color:var(--charcoal);">${SETTIMANE[spesaWeek].label}</span>
+    <button onclick="changeSpesaWeek(1)" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--sage);" ${spesaWeek===3?'disabled style="opacity:0.3;cursor:default"':''}>Sett. succ. ›</button>
+  `;
+
+  const el = document.getElementById('spesaContent');
+  let totalItems = 0;
+  let checkedItems = 0;
+  let html = '';
+
+  for (const [cat, items] of Object.entries(SPESA)) {
+    html += `<div class="spesa-category"><div class="spesa-cat-title">${cat}</div>`;
+    items.forEach((item, i) => {
+      const key = `w${spesaWeek}_${cat}_${i}`;
+      const checked = !!spesaChecked[key];
+      if (checked) checkedItems++;
+      totalItems++;
+      html += `
+        <div class="spesa-item ${checked ? 'checked' : ''}" onclick="toggleSpesa('${key}', this, ${totalItems - 1})">
+          <div class="spesa-check"><span class="spesa-check-icon">✓</span></div>
+          <span class="spesa-name">${item.nome}</span>
+          <span class="spesa-qty">${item.qty}</span>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  el.innerHTML = html;
+  updateSpesaCount(checkedItems, totalItems);
+}
+
+function changeSpesaWeek(dir) {
+  currentWeek = Math.max(0, Math.min(3, currentWeek + dir));
+  renderSpesa();
+}
+
+function updateSpesaCount(checked, total) {
+  const c = checked ?? Object.values(spesaChecked).filter(Boolean).length;
+  const t = total ?? Object.values(SPESA_SETTIMANE[spesaWeek]).reduce((s, arr) => s + arr.length, 0);
+  document.getElementById('spesaCount').textContent = `${c} di ${t} articoli nel carrello`;
+}
+
+function toggleSpesa(key, el) {
+  spesaChecked[key] = !spesaChecked[key];
+  localStorage.setItem('erika_spesa_checked', JSON.stringify(spesaChecked));
+  el.classList.toggle('checked', spesaChecked[key]);
+  updateSpesaCount();
+}
+
+function resetSpesa() {
+  // Reset only current week keys
+  Object.keys(spesaChecked).forEach(k => { if (k.startsWith(`w${spesaWeek}_`)) delete spesaChecked[k]; });
+  localStorage.setItem('erika_spesa_checked', JSON.stringify(spesaChecked));
+  renderSpesa();
+  showToast('✓ Spunte azzerate');
+}
+
+
+
+// ─── CHATBOT ──────────────────────────────────────────────────────
+let chatHistory = [];
+
+function appendBubble(text, role) {
+  const el = document.createElement('div');
+  el.className = 'chat-bubble ' + (role === 'user' ? 'user-bubble' : 'coach-bubble');
+  el.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  document.getElementById('chatMessages').appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return el;
+}
+
+function appendTyping() {
+  const el = document.createElement('div');
+  el.className = 'coach-typing';
+  el.id = 'typingIndicator';
+  el.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  document.getElementById('chatMessages').appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+function hideSuggestions() {
+  document.getElementById('chatSuggestions').style.display = 'none';
+}
+
+async function sendQuick(text) {
+  hideSuggestions();
+  document.getElementById('chatInput').value = text;
+  await sendChat();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  hideSuggestions();
+  input.value = '';
+  input.style.height = 'auto';
+
+  appendBubble(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+  appendTyping();
+
+  const currentWeight = pesiLog.length > 0 ? pesiLog[pesiLog.length - 1].peso : 73;
+  const lost = (73 - currentWeight).toFixed(1);
+
+  // Detect menu change intent
+  const isMenuChange = /cambia|sostituisci|modifica|non mi piace|al posto|invece di|togli|metti|diverso|altra cena|altro pranzo/i.test(text);
+
+  const systemPrompt = isMenuChange
+    ? `Sei la coach personale di Erika e puoi MODIFICARE il suo piano alimentare.
+    
+Profilo: peso ${currentWeight}kg → 65kg, Crohn (no glutine, poco lattosio), low-carb, padel 3h/sett.
+
+Quando Erika chiede di cambiare un pasto, rispondi con:
+1. Un messaggio empatico breve (1 riga)
+2. Il blocco JSON di modifica in questo formato ESATTO (non modificare i tag):
+<MENU_EDIT>
+{
+  "settimana": [numero 0-3],
+  "giorno": [numero 0-6, lun=0],
+  "tipo": "Cena",
+  "nome": "Nome del nuovo piatto",
+  "desc": "Descrizione breve del piatto, ingredienti principali.",
+  "kcal": [numero calorie stimate]
+}
+</MENU_EDIT>
+3. Breve descrizione del piatto suggerito e perché è adatto al Crohn.
+
+Se non capisci quale giorno/settimana intende, chiedi chiarimenti.
+Suggerisci sempre piatti senza glutine e Crohn-friendly.`
+    : `Sei la coach personale di Erika, una donna che sta seguendo un percorso di dimagrimento.
+    
+Profilo: peso ${currentWeight}kg (persi ${lost}kg), obiettivo 65kg, Crohn (no glutine, poco lattosio), low-carb, padel 3h/sett.
+
+Stile: calda, empatica, mai giudicante, italiana, come un'amica. Rispondi in max 4-5 righe.
+Non iniziare mai con "Ciao Erika".`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content[0].text;
+    removeTyping();
+
+    // Check for menu edit JSON
+    const editMatch = reply.match(/<MENU_EDIT>([\s\S]*?)<\/MENU_EDIT>/);
+    if (editMatch) {
+      try {
+        const edit = JSON.parse(editMatch[1].trim());
+        const cleanReply = reply.replace(/<MENU_EDIT>[\s\S]*?<\/MENU_EDIT>/, '').trim();
+        appendBubble(cleanReply, 'coach');
+
+        // Show apply button
+        const applyDiv = document.createElement('div');
+        applyDiv.className = 'menu-change-chip';
+        applyDiv.innerHTML = `
+          <strong>📋 Modifica proposta:</strong><br>
+          ${SETTIMANE[edit.settimana]?.label || 'Sett.'} · ${['Lun','Mar','Mer','Gio','Ven','Sab','Dom'][edit.giorno]} · ${edit.tipo}<br>
+          <em>${edit.nome}</em> (~${edit.kcal} kcal)
+          <br><button class="menu-apply-btn" onclick="applyMenuEdit(${edit.settimana},${edit.giorno},'${edit.tipo}','${edit.nome.replace(/'/g,"\\'")}','${edit.desc.replace(/'/g,"\\'")}',${edit.kcal}); this.textContent='✓ Applicato!'; this.disabled=true;">
+            Applica modifica al menù
+          </button>
+        `;
+        document.getElementById('chatMessages').appendChild(applyDiv);
+        applyDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } catch {
+        appendBubble(reply.replace(/<MENU_EDIT>[\s\S]*?<\/MENU_EDIT>/, '').trim(), 'coach');
+      }
+    } else {
+      appendBubble(reply, 'coach');
+    }
+
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch {
+    removeTyping();
+    appendBubble('Ops, problema di connessione. Riprova tra un momento 🌿', 'coach');
+  }
+}
+
+// ─── CALORIE DIARY ────────────────────────────────────────────────
+function todayKey() {
+  return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+}
+
+function loadKcalLog() {
+  return JSON.parse(localStorage.getItem('erika_kcal_log') || '{}');
+}
+
+function saveKcalLog(log) {
+  localStorage.setItem('erika_kcal_log', JSON.stringify(log));
+}
+
+function saveKcalFromPhoto() {
+  if (!lastAnalyzedKcal) return;
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const log = loadKcalLog();
+  const key = todayKey();
+  if (!log[key]) log[key] = [];
+  log[key].push({ nome: lastAnalyzedName, kcal: lastAnalyzedKcal, ora: timeStr });
+  saveKcalLog(log);
+  showToast(`✓ ${lastAnalyzedKcal} kcal salvate nel diario!`);
+  // Update save button
+  const btn = document.querySelector('#fotoAnalysis .btn-primary');
+  if (btn) { btn.textContent = '✓ Salvato!'; btn.disabled = true; btn.style.opacity = '0.6'; }
+}
+
+function saveManualKcal() {
+  const name = document.getElementById('manualMealName').value.trim() || 'Pasto';
+  const kcal = parseInt(document.getElementById('manualMealKcal').value);
+  if (!kcal || kcal < 1) { showToast('Inserisci le calorie'); return; }
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const log = loadKcalLog();
+  const key = todayKey();
+  if (!log[key]) log[key] = [];
+  log[key].push({ nome: name, kcal, ora: timeStr });
+  saveKcalLog(log);
+  document.getElementById('manualMealName').value = '';
+  document.getElementById('manualMealKcal').value = '';
+  document.getElementById('kcalManualForm').classList.remove('open');
+  renderCalorieDiary();
+  showToast(`✓ ${kcal} kcal aggiunte!`);
+}
+
+function deleteKcalEntry(dateKey, idx) {
+  const log = loadKcalLog();
+  if (log[dateKey]) { log[dateKey].splice(idx, 1); saveKcalLog(log); }
+  renderCalorieDiary();
+}
+
+function toggleManualKcal() {
+  document.getElementById('kcalManualForm').classList.toggle('open');
+}
+
+function renderCalorieDiary() {
+  const log = loadKcalLog();
+  const key = todayKey();
+  const todayMeals = log[key] || [];
+  const todayTotal = todayMeals.reduce((s, m) => s + m.kcal, 0);
+  const pct = Math.min(100, Math.round((todayTotal / KCAL_TARGET) * 100));
+  const remaining = Math.max(0, KCAL_TARGET - todayTotal);
+
+  document.getElementById('kcalTodayNum').innerHTML = `${todayTotal} <span>kcal</span>`;
+  document.getElementById('kcalTargetNum').textContent = `${KCAL_TARGET} kcal`;
+  document.getElementById('kcalRemainingLabel').textContent = todayTotal > KCAL_TARGET
+    ? `⚠️ ${todayTotal - KCAL_TARGET} kcal oltre il target`
+    : `${remaining} kcal rimanenti`;
+  document.getElementById('kcalPctLabel').textContent = pct + '%';
+
+  const fill = document.getElementById('kcalTrackFill');
+  fill.style.width = pct + '%';
+  fill.className = 'kcal-track-fill' + (todayTotal > KCAL_TARGET ? ' over' : '');
+
+  // Meals list
+  const list = document.getElementById('kcalMealsList');
+  if (todayMeals.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Nessun pasto registrato oggi. Carica una foto o aggiungi manualmente!</div>';
+  } else {
+    list.innerHTML = todayMeals.map((m, i) => `
+      <div class="kcal-meal-row">
+        <span class="kcal-meal-name">${m.nome}</span>
+        <span class="kcal-meal-time">${m.ora}</span>
+        <span class="kcal-meal-val">${m.kcal} kcal</span>
+        <button class="kcal-meal-del" onclick="deleteKcalEntry('${key}',${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  // Weekly chart
+  renderWeekChart(log);
+}
+
+function renderWeekChart(log) {
+  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const today = new Date();
+  // Get last 7 days
+  const weekData = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const k = d.toISOString().split('T')[0];
+    const total = (log[k] || []).reduce((s, m) => s + m.kcal, 0);
+    weekData.push({ label: days[d.getDay()], total, isToday: i === 0, key: k });
+  }
+  const max = Math.max(...weekData.map(d => d.total), KCAL_TARGET);
+
+  const el = document.getElementById('kcalWeekBars');
+  el.innerHTML = weekData.map(d => {
+    const h = d.total > 0 ? Math.max(6, Math.round((d.total / max) * 90)) : 4;
+    const cls = d.isToday ? 'today' : d.total > KCAL_TARGET ? 'over' : '';
+    return `<div class="kcal-bar-wrap">
+      <div class="kcal-bar-val">${d.total > 0 ? d.total : ''}</div>
+      <div class="kcal-bar ${cls}" style="height:${h}px"></div>
+      <div class="kcal-bar-day" style="${d.isToday ? 'color:var(--sage);font-weight:600' : ''}">${d.label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── MENU EDITING VIA COACH ───────────────────────────────────────
+let menuEdits = JSON.parse(localStorage.getItem('erika_menu_edits') || '{}');
+
+function applyMenuEdit(weekIdx, dayIdx, pastoType, newNome, newDesc, newKcal) {
+  const key = `${weekIdx}_${dayIdx}_${pastoType}`;
+  menuEdits[key] = { nome: newNome, desc: newDesc, kcal: newKcal };
+  localStorage.setItem('erika_menu_edits', JSON.stringify(menuEdits));
+  if (document.getElementById('screen-dieta').classList.contains('active')) renderDay();
+  showToast('✓ Menù aggiornato!');
+}
+
+// ─── INSPO PHOTO ──────────────────────────────────────────────────
+const INSPO_CAPTIONS = [
+  'Questa sei tu. Ci stai tornando. 💚',
+  'Ricordati perché hai iniziato.',
+  'Il tuo obiettivo ha un volto. Questo.',
+  'Ogni pasto sano ti riavvicina a lei.',
+  'Forza, Erika. Ce la fai. ✦'
+];
+
+function renderInspoWrap() {
+  const saved = localStorage.getItem('erika_inspo_photo');
+  const wrap = document.getElementById('inspoWrap');
+  if (saved) {
+    const caption = INSPO_CAPTIONS[Math.floor(Math.random() * INSPO_CAPTIONS.length)];
+    wrap.innerHTML = `
+      <div class="inspo-card">
+        <img class="inspo-photo" src="${saved}" alt="La mia foto obiettivo">
+        <div class="inspo-overlay">
+          <div class="inspo-label">La mia foto obiettivo</div>
+          <div class="inspo-caption">${caption}</div>
+        </div>
+        <button class="inspo-change-btn" onclick="document.getElementById('inspo-input').click()">Cambia foto</button>
+      </div>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <div class="inspo-empty" onclick="document.getElementById('inspo-input').click()">
+        <div class="inspo-empty-icon">🌟</div>
+        <div class="inspo-empty-text">
+          <strong>Aggiungi la tua foto obiettivo</strong>
+          Carica una foto di quando ti sentivi al top — ti darà la carica nei momenti difficili!
+        </div>
+      </div>
+    `;
+  }
+}
+
+function handleInspoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('erika_inspo_photo', e.target.result);
+    renderInspoWrap();
+    showToast('✓ Foto salvata!');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+updateProgress();
+loadMotivation();
+renderInspoWrap();</script>
+</body>
+</html>
