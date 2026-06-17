@@ -447,6 +447,25 @@
   .snack-kcal { font-size: 12px; color: var(--sage); font-weight: 500; margin-bottom: 4px; }
   .snack-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
 
+  .advice-btn {
+    flex-shrink: 0;
+    background: var(--accent-light); color: var(--accent);
+    border: 1.5px solid #e8b49f; border-radius: 10px;
+    padding: 8px 14px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .advice-btn:hover { background: #f9cfc4; }
+  .advice-btn.loading { opacity: 0.6; pointer-events: none; }
+  .meal-advice {
+    margin-top: 10px; font-size: 13px; line-height: 1.6;
+    color: var(--charcoal); display: none;
+    background: var(--accent-light); border-radius: 10px;
+    padding: 12px 14px; border-left: 3px solid var(--accent);
+  }
+  .meal-advice.visible { display: block; }
+
+  /* EDIT MEAL BUTTON */
   .edit-meal-btn {
     background: none; border: 1.5px solid var(--border);
     border-radius: 20px; padding: 5px 10px;
@@ -1057,26 +1076,31 @@ function showScreen(name, btn) {
   if (name === 'calorie') renderCalorieDiary();
 }
 
+// ─── GEMINI API ───────────────────────────────────────────────────
+const GEMINI_KEY = 'AIzaSyAQ.Ab8RN6JzmbZm5AJZlusUJiSW-LNkUe47BSaFL_hyD5cgM2AsdA';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+
+async function callGemini(prompt) {
+  const res = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1000 }
+    })
+  });
+  const data = await res.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
 // ─── MOTIVATION ───────────────────────────────────────────────────
 async function loadMotivation() {
   const el = document.getElementById('motivQuote');
   el.textContent = '...';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Sei un coach di benessere personale per Erika, che vuole perdere 8 kg (da 73 a 65 kg), pratica padel 3 ore a settimana e ha il morbo di Crohn. 
-Genera UN messaggio motivazionale breve (massimo 2 frasi), caldo, personale, in italiano. Può essere ispirazionale, pratico o simpatico. Varia ogni volta. Non iniziare con "Ciao" o "Erika". Solo il messaggio, niente altro.`
-        }]
-      })
-    });
-    const data = await res.json();
-    el.textContent = data.content[0].text;
+    const text = await callGemini(`Sei un coach di benessere personale per Erika, che vuole perdere 8 kg (da 73 a 65 kg), pratica padel 3 ore a settimana e ha il morbo di Crohn. 
+Genera UN messaggio motivazionale breve (massimo 2 frasi), caldo, personale, in italiano. Può essere ispirazionale, pratico o simpatico. Varia ogni volta. Non iniziare con "Ciao" o "Erika". Solo il messaggio, niente altro.`);
+    el.textContent = text.trim();
   } catch {
     const fallback = [
       'Ogni scelta sana è un voto per la persona che vuoi diventare.',
@@ -1249,7 +1273,11 @@ function renderDay() {
           <div class="meal-name">${p.nome}</div>
           <div class="meal-desc">${p.desc}</div>
           <div class="meal-tags">${p.tags.map(t => `<span class="tag ${t==='s.g.'?'gluten':''}">${t}</span>`).join('')}</div>
-          ${p.ricetta ? `<button class="recipe-btn" onclick="showRecipe(${currentWeek},${currentDay},${pi})">📖 Vedi ricetta completa</button>` : ''}
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            ${p.ricetta ? `<button class="recipe-btn" style="flex:1;margin-top:0;" onclick="showRecipe(${currentWeek},${currentDay},${pi})">📖 Ricetta</button>` : '<div style="flex:1"></div>'}
+            <button class="advice-btn" onclick="getMealAdvice('${p.nome.replace(/'/g,'')}','${p.tipo}',${p.kcal},this)">💡 Consiglio</button>
+          </div>
+          <div class="meal-advice" id="advice_${currentWeek}_${currentDay}_${pi}"></div>
         </div>
       </div>`;
     }).join('')}
@@ -1862,18 +1890,23 @@ Stile: calda, empatica, mai giudicante, italiana, come un'amica. Rispondi in max
 Non iniziare mai con "Ciao Erika".`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    // Build Gemini conversation history
+    const geminiContents = chatHistory.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(GEMINI_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: chatHistory
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: geminiContents,
+        generationConfig: { maxOutputTokens: 1000 }
       })
     });
     const data = await res.json();
-    const reply = data.content[0].text;
+    const reply = data.candidates[0].content.parts[0].text;
     removeTyping();
 
     // Check for menu edit JSON
@@ -2165,6 +2198,47 @@ function saveEditedMeal() {
   applyMenuEdit(weekIdx, dayIdx, tipo, calcolatoNome, calcolatoDesc, calcolatoKcal);
   closeEditModal();
   showToast(`✓ ${tipo} aggiornato!`);
+}
+
+// ─── CONSIGLIO NUTRIZIONALE ───────────────────────────────────────
+async function getMealAdvice(nomePasto, tipo, kcal, btn) {
+  // Toggle: se il consiglio è già visibile, nascondilo
+  const card = btn.closest('.meal-card');
+  const adviceEl = card.querySelector('.meal-advice');
+  if (adviceEl.classList.contains('visible')) {
+    adviceEl.classList.remove('visible');
+    btn.textContent = '💡 Consiglio';
+    return;
+  }
+
+  btn.textContent = '⏳';
+  btn.classList.add('loading');
+
+  const currentWeight = pesiLog.length > 0 ? pesiLog[pesiLog.length - 1].peso : 73;
+
+  try {
+    const prompt = `Sei una nutrizionista esperta che conosce bene Erika: pesa ${currentWeight}kg, vuole arrivare a 65kg, ha il morbo di Crohn (deve evitare glutine e limitare lattosio), segue una dieta low-carb, fa padel 3h/settimana. Target calorico: 1450 kcal/giorno.
+
+Erika sta per mangiare: "${nomePasto}" (${tipo}, ~${kcal} kcal).
+
+Dammi 2-3 consigli pratici e personalizzati in italiano su questo piatto. Puoi suggerire:
+- Quantità ideale di proteine/carboidrati/verdure
+- Modifiche per renderlo più Crohn-friendly
+- Come bilanciarlo con gli altri pasti della giornata
+- Sostituzioni o aggiunte utili
+
+Sii concisa, diretta e incoraggiante. Usa massimo 4 righe. Non iniziare con "Ciao".`;
+
+    const testo = await callGemini(prompt);
+    adviceEl.innerHTML = testo.trim().replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+    adviceEl.classList.add('visible');
+    btn.textContent = '💡 Nascondi';
+  } catch {
+    adviceEl.innerHTML = '⚠️ Consiglio non disponibile al momento.';
+    adviceEl.classList.add('visible');
+    btn.textContent = '💡 Consiglio';
+  }
+  btn.classList.remove('loading');
 }
 
 // ─── INSPO PHOTO ──────────────────────────────────────────────────
