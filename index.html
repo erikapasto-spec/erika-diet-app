@@ -447,6 +447,14 @@
   .snack-kcal { font-size: 12px; color: var(--sage); font-weight: 500; margin-bottom: 4px; }
   .snack-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
 
+  .edit-meal-btn {
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 5px 10px;
+    font-size: 14px; cursor: pointer; margin-right: 6px;
+    transition: all 0.2s; color: var(--muted);
+  }
+  .edit-meal-btn:hover { background: var(--sage-pale); border-color: var(--sage-light); }
+
   /* MEAL CHECK BUTTON */
   .meal-check-btn {
     flex-shrink: 0;
@@ -868,6 +876,26 @@
   <div id="spesaContent" style="padding: 0 16px 100px;"></div>
 </div>
 
+<!-- EDIT MEAL MODAL -->
+<div class="modal-overlay" id="editMealModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editMealTitle">Modifica pasto</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">
+      Scrivi il nome del nuovo piatto — l'AI calcolerà le calorie e lo salverà nel menù 🩷
+    </p>
+    <input class="kcal-manual-input" id="editMealInput" placeholder="Es. Insalata di pollo con avocado..." style="width:100%;margin-bottom:12px;">
+    <div id="editMealResult"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn-primary" style="flex:1;" onclick="calcEditMealKcal()">Calcola calorie</button>
+      <button class="btn-secondary" onclick="closeEditModal()">Annulla</button>
+    </div>
+    <button class="close-modal" id="editMealSaveBtn" style="display:none;margin-top:8px;" onclick="saveEditedMeal()">
+      ✓ Salva nel menù
+    </button>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav">
   <button class="nav-btn active" onclick="showScreen('home', this)">
@@ -1211,6 +1239,7 @@ function renderDay() {
             <div class="meal-title">${p.tipo}</div>
             <div class="meal-kcal">~${p.kcal} kcal</div>
           </div>
+          <button class="edit-meal-btn" onclick="openEditMeal(${currentWeek},${currentDay},'${p.tipo}','${p.nome.replace(/'/g,'')}')">✏️</button>
           <button class="meal-check-btn ${alreadyLogged ? 'logged' : ''}"
             onclick="toggleMealLog(${currentWeek},${currentDay},${pi},'${p.tipo}',${p.kcal},'${p.nome.replace(/'/g,'')}',this)">
             ${alreadyLogged ? '✓ Mangiato' : '+ Segna'}
@@ -2011,6 +2040,84 @@ function applyMenuEdit(weekIdx, dayIdx, pastoType, newNome, newDesc, newKcal) {
   localStorage.setItem('erika_menu_edits', JSON.stringify(menuEdits));
   if (document.getElementById('screen-dieta').classList.contains('active')) renderDay();
   showToast('✓ Menù aggiornato!');
+}
+
+// ─── MODIFICA PASTO ───────────────────────────────────────────────
+let editContext = { weekIdx: 0, dayIdx: 0, tipo: '', calcolatoKcal: 0, calcolatoNome: '', calcolatoDesc: '' };
+
+function openEditMeal(weekIdx, dayIdx, tipo, nomeAttuale) {
+  editContext = { weekIdx, dayIdx, tipo, calcolatoKcal: 0, calcolatoNome: '', calcolatoDesc: '' };
+  document.getElementById('editMealTitle').textContent = `Modifica ${tipo}`;
+  document.getElementById('editMealInput').value = '';
+  document.getElementById('editMealResult').innerHTML = '';
+  document.getElementById('editMealSaveBtn').style.display = 'none';
+  document.getElementById('editMealModal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('editMealModal').classList.remove('open');
+}
+
+async function calcEditMealKcal() {
+  const nome = document.getElementById('editMealInput').value.trim();
+  if (!nome) { showToast('Scrivi il nome del piatto!'); return; }
+
+  const el = document.getElementById('editMealResult');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Calcolo calorie in corso...</div>';
+  document.getElementById('editMealSaveBtn').style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Sei un nutrizionista. Per il piatto "${nome}" dimmi:
+- Le calorie stimate per una porzione normale
+- Una descrizione breve (max 15 parole)
+- Se è adatto per morbo di Crohn (senza glutine, poco lattosio, low-carb)
+
+Rispondi SOLO in questo formato JSON (niente altro):
+{"kcal": 450, "desc": "Descrizione breve del piatto", "crohn": true}
+
+Solo il JSON, nessun testo prima o dopo.`
+        }]
+      })
+    });
+    const data = await res.json();
+    let text = data.content[0].text.trim();
+    text = text.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(text);
+
+    editContext.calcolatoKcal = result.kcal;
+    editContext.calcolatoNome = nome;
+    editContext.calcolatoDesc = result.desc;
+
+    el.innerHTML = `
+      <div class="ai-response" style="margin-top:0;">
+        <div class="ai-label"><div class="ai-dot"></div>Risultato AI</div>
+        <div class="ai-text">
+          <strong>${nome}</strong><br>
+          🔥 <strong>${result.kcal} kcal</strong> per porzione<br>
+          ${result.desc}<br>
+          ${result.crohn ? '💚 Compatibile con il Crohn' : '⚠️ Attenzione — potrebbe non essere ideale per il Crohn'}
+        </div>
+      </div>`;
+    document.getElementById('editMealSaveBtn').style.display = 'block';
+  } catch {
+    el.innerHTML = '<div style="color:var(--accent);font-size:13px;">Errore nel calcolo. Riprova.</div>';
+  }
+}
+
+function saveEditedMeal() {
+  const { weekIdx, dayIdx, tipo, calcolatoKcal, calcolatoNome, calcolatoDesc } = editContext;
+  if (!calcolatoKcal) return;
+  applyMenuEdit(weekIdx, dayIdx, tipo, calcolatoNome, calcolatoDesc, calcolatoKcal);
+  closeEditModal();
+  showToast(`✓ ${tipo} aggiornato!`);
 }
 
 // ─── INSPO PHOTO ──────────────────────────────────────────────────
