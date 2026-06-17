@@ -2058,39 +2058,88 @@ function closeEditModal() {
   document.getElementById('editMealModal').classList.remove('open');
 }
 
-async function calcEditMealKcal() {
+// Database calorie piatti comuni (porzione singola)
+const KCAL_DB = [
+  // Pesce
+  {k:['salmone','salmon'],kcal:320,desc:'Salmone al forno o grigliato con verdure',crohn:true},
+  {k:['tonno'],kcal:200,desc:'Tonno al naturale in insalata',crohn:true},
+  {k:['branzino','spigola'],kcal:280,desc:'Branzino al forno con erbe aromatiche',crohn:true},
+  {k:['orata'],kcal:270,desc:'Orata al forno con verdure',crohn:true},
+  {k:['merluzzo','baccalà'],kcal:240,desc:'Merluzzo al vapore o al forno',crohn:true},
+  {k:['gamberi','gamberoni','gamberetti'],kcal:200,desc:'Gamberi saltati con aglio e olio',crohn:true},
+  {k:['vongole'],kcal:280,desc:'Vongole in padella con aglio e prezzemolo',crohn:true},
+  {k:['coda di rospo'],kcal:260,desc:'Coda di rospo al forno con pomodorini',crohn:true},
+  {k:['polpo'],kcal:230,desc:'Polpo in insalata o grigliato',crohn:true},
+  {k:['calamari','seppie'],kcal:260,desc:'Calamari grigliati con limone',crohn:true},
+  // Carne
+  {k:['pollo'],kcal:320,desc:'Pollo grigliato o al forno con erbe',crohn:true},
+  {k:['tacchino'],kcal:300,desc:'Petto di tacchino grigliato o in padella',crohn:true},
+  {k:['manzo','bistecca','tagliata'],kcal:400,desc:'Manzo grigliato con rucola e grana',crohn:true},
+  {k:['maiale','lonza'],kcal:350,desc:'Lonza di maiale al forno',crohn:true},
+  {k:['polpette'],kcal:420,desc:'Polpette al sugo con verdure',crohn:true},
+  {k:['hamburger'],kcal:450,desc:'Burger di carne o pesce con insalata',crohn:true},
+  // Uova
+  {k:['uova','frittata','omelette'],kcal:250,desc:'Uova strapazzate o frittata con verdure',crohn:true},
+  {k:['uova in camicia'],kcal:200,desc:'Uova in camicia su minestrone',crohn:true},
+  // Pasta e cereali
+  {k:['pasta','spaghetti','penne','rigatoni','fusilli'],kcal:500,desc:'Pasta con sugo e verdure (porzione 80g)',crohn:false},
+  {k:['pasta di lenticchie','pasta di legumi'],kcal:480,desc:'Pasta di lenticchie senza glutine con condimento',crohn:true},
+  {k:['pasta di riso'],kcal:470,desc:'Pasta di riso senza glutine con condimento',crohn:true},
+  {k:['pasta di mais'],kcal:470,desc:'Pasta di mais senza glutine con condimento',crohn:true},
+  {k:['riso'],kcal:380,desc:'Riso basmati o venere con condimento',crohn:true},
+  {k:['risotto'],kcal:480,desc:'Risotto con verdure o pesce',crohn:false},
+  {k:['quinoa'],kcal:370,desc:'Quinoa con verdure e proteina',crohn:true},
+  // Verdure e legumi
+  {k:['insalata','caesar','mista'],kcal:280,desc:'Insalata con proteina e condimento leggero',crohn:true},
+  {k:['lenticchie'],kcal:380,desc:'Lenticchie in insalata con feta e pomodori',crohn:true},
+  {k:['ceci'],kcal:360,desc:'Ceci in zuppa o insalata',crohn:true},
+  {k:['fagioli'],kcal:340,desc:'Fagioli in zuppa con verdure',crohn:false},
+  {k:['minestrone','zuppa','vellutata'],kcal:280,desc:'Minestrone di verdure di stagione',crohn:true},
+  {k:['parmigiana'],kcal:480,desc:'Parmigiana light di zucchine o melanzane',crohn:false},
+  {k:['peperoni ripieni'],kcal:520,desc:'Peperoni ripieni di macinato al forno',crohn:true},
+  {k:['involtini'],kcal:420,desc:'Involtini di melanzane con ricotta light',crohn:true},
+  {k:['melanzane'],kcal:300,desc:'Melanzane grigliate o al forno',crohn:true},
+  // Insalate proteiche
+  {k:['insalata di tonno'],kcal:300,desc:'Insalata di tonno con verdure e olio EVO',crohn:true},
+  {k:['insalata di pollo'],kcal:320,desc:'Insalata di pollo grigliato con verdure',crohn:true},
+  {k:['insalata di riso'],kcal:420,desc:'Insalata di riso con verdure e proteina',crohn:true},
+  {k:['feta'],kcal:350,desc:'Insalata con feta, cetrioli e olive',crohn:false},
+  {k:['avocado'],kcal:380,desc:'Insalata con avocado e proteina',crohn:true},
+  // Altro
+  {k:['curry'],kcal:480,desc:'Curry leggero con riso o quinoa',crohn:false},
+  {k:['tartare','carpaccio'],kcal:280,desc:'Tartare o carpaccio con rucola',crohn:true},
+];
+
+function calcKcalLocale(nomePiatto) {
+  const lower = nomePiatto.toLowerCase();
+  // Cerca nel database
+  for (const entry of KCAL_DB) {
+    if (entry.k.some(k => lower.includes(k))) {
+      return entry;
+    }
+  }
+  // Stima generica in base a parole chiave
+  if (lower.includes('light') || lower.includes('insalata') || lower.includes('vapore')) {
+    return { kcal: 280, desc: 'Piatto leggero con verdure e proteina', crohn: true };
+  }
+  if (lower.includes('fritto') || lower.includes('impanato') || lower.includes('gratinato')) {
+    return { kcal: 520, desc: 'Piatto più elaborato con cottura ricca', crohn: false };
+  }
+  // Default
+  return { kcal: 420, desc: 'Piatto bilanciato con proteina e verdure', crohn: true };
+}
+
+function calcEditMealKcal() {
   const nome = document.getElementById('editMealInput').value.trim();
   if (!nome) { showToast('Scrivi il nome del piatto!'); return; }
 
   const el = document.getElementById('editMealResult');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div>Calcolo calorie in corso...</div>';
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Calcolo in corso...</div>';
   document.getElementById('editMealSaveBtn').style.display = 'none';
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Sei un nutrizionista. Per il piatto "${nome}" dimmi:
-- Le calorie stimate per una porzione normale
-- Una descrizione breve (max 15 parole)
-- Se è adatto per morbo di Crohn (senza glutine, poco lattosio, low-carb)
-
-Rispondi SOLO in questo formato JSON (niente altro):
-{"kcal": 450, "desc": "Descrizione breve del piatto", "crohn": true}
-
-Solo il JSON, nessun testo prima o dopo.`
-        }]
-      })
-    });
-    const data = await res.json();
-    let text = data.content[0].text.trim();
-    text = text.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(text);
+  // Piccolo delay per effetto UX
+  setTimeout(() => {
+    const result = calcKcalLocale(nome);
 
     editContext.calcolatoKcal = result.kcal;
     editContext.calcolatoNome = nome;
@@ -2098,18 +2147,16 @@ Solo il JSON, nessun testo prima o dopo.`
 
     el.innerHTML = `
       <div class="ai-response" style="margin-top:0;">
-        <div class="ai-label"><div class="ai-dot"></div>Risultato AI</div>
+        <div class="ai-label"><div class="ai-dot"></div>Risultato</div>
         <div class="ai-text">
           <strong>${nome}</strong><br>
-          🔥 <strong>${result.kcal} kcal</strong> per porzione<br>
+          🔥 <strong>~${result.kcal} kcal</strong> per porzione<br>
           ${result.desc}<br>
-          ${result.crohn ? '💚 Compatibile con il Crohn' : '⚠️ Attenzione — potrebbe non essere ideale per il Crohn'}
+          ${result.crohn ? '💚 Compatibile con il Crohn' : '⚠️ Attenzione — valuta la tollerabilità per il Crohn'}
         </div>
       </div>`;
     document.getElementById('editMealSaveBtn').style.display = 'block';
-  } catch {
-    el.innerHTML = '<div style="color:var(--accent);font-size:13px;">Errore nel calcolo. Riprova.</div>';
-  }
+  }, 600);
 }
 
 function saveEditedMeal() {
