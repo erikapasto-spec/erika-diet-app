@@ -555,6 +555,45 @@
   }
   .kcal-manual-input:focus { border-color:var(--sage); }
 
+  /* ─── ALIMENTI SCREEN ─── */
+  .alimenti-intro { padding: 12px 16px 4px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .alimenti-section { margin: 0 16px 20px; }
+  .alimenti-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--sage-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .alimenti-grid { display: flex; flex-direction: column; gap: 8px; }
+  .alimento-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alimento-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .alimento-info { flex: 1; }
+  .alimento-nome { font-weight: 500; font-size: 14px; color: var(--charcoal); }
+  .alimento-nota { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .alimento-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-ok { background: #e8f5e9; color: #2e7d32; }
+  .badge-mod { background: #fff8e1; color: #f57f17; }
+
   /* coach menu-change chip */
   .menu-change-chip {
     background:var(--accent-light); border:1px solid #e8b49f;
@@ -901,18 +940,137 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="editMealTitle">Modifica pasto</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">
-      Scrivi il nome del nuovo piatto — l'AI calcolerà le calorie e lo salverà nel menù 🩷
+      Scrivi il nuovo piatto, anche con ingredienti e grammature — l'AI calcola le calorie esatte 🩷
     </p>
-    <input class="kcal-manual-input" id="editMealInput" placeholder="Es. Insalata di pollo con avocado..." style="width:100%;margin-bottom:12px;">
-    <div id="editMealResult"></div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button class="btn-primary" style="flex:1;" onclick="calcEditMealKcal()">Calcola calorie</button>
+
+    <!-- Tabs: nome piatto vs ingredienti -->
+    <div style="display:flex;gap:0;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <button id="editTab1" onclick="switchEditTab(1)"
+        style="flex:1;padding:8px;font-size:13px;border:none;background:var(--sage);color:white;cursor:pointer;font-weight:600;">
+        🍽️ Nome piatto
+      </button>
+      <button id="editTab2" onclick="switchEditTab(2)"
+        style="flex:1;padding:8px;font-size:13px;border:none;background:transparent;color:var(--muted);cursor:pointer;">
+        🥗 Ingredienti
+      </button>
+    </div>
+
+    <!-- Tab 1: nome piatto -->
+    <div id="editTabPane1">
+      <input class="kcal-manual-input" id="editMealInput"
+        placeholder="Es. Insalata di pollo con avocado e feta..."
+        style="width:100%;margin-bottom:8px;"
+        onkeydown="if(event.key==='Enter') calcEditMealKcal()">
+      <p style="font-size:11px;color:var(--muted);margin:0 0 12px;">
+        Puoi scrivere anche preparazione e condimento per una stima più precisa
+      </p>
+    </div>
+
+    <!-- Tab 2: ingredienti con grammature -->
+    <div id="editTabPane2" style="display:none;">
+      <div id="editIngredientsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+      <button onclick="addIngredientRow()"
+        style="width:100%;padding:8px;border:1.5px dashed var(--sage-light);border-radius:10px;background:transparent;color:var(--sage);font-size:13px;cursor:pointer;margin-bottom:12px;">
+        + Aggiungi ingrediente
+      </button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn-primary" style="flex:1;" onclick="calcEditMealKcal()">
+        🔥 Calcola calorie con AI
+      </button>
       <button class="btn-secondary" onclick="closeEditModal()">Annulla</button>
     </div>
+
+    <div id="editMealResult"></div>
+
     <button class="close-modal" id="editMealSaveBtn" style="display:none;margin-top:8px;" onclick="saveEditedMeal()">
-      ✓ Salva nel menù
+      ✓ Salva e aggiorna totale giornata
     </button>
   </div>
+</div>
+
+<!-- SCREEN ALIMENTI -->
+<div class="screen" id="screen-alimenti">
+  <p class="alimenti-intro">Alimenti consigliati dal tuo nutrizionista — da usare liberamente nelle variazioni dei pasti o come riferimento per la spesa.</p>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🧀 Formaggi magri</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Ricotta vaccina</div><div class="alimento-nota">~130 kcal/100g — ottima in abbinamento a pasta, bruschette e frittate</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Feta greca</div><div class="alimento-nota">~260 kcal/100g — usare nelle insalate e al pranzo, porzione 60–80g</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Caprino fresco</div><div class="alimento-nota">~200 kcal/100g — ideale negli involtini di bresaola</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Mozzarella light / di bufala</div><div class="alimento-nota">~180 kcal/100g — nelle bruschette e parmigiana, porzione 80–100g</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Sottilette light (1 fetta)</div><div class="alimento-nota">~40 kcal/fetta — in abbinamento alle uova</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Grana Padano (scaglie)</div><div class="alimento-nota">~20–30g — per insalate e piatti, usare in piccole quantità</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🧀</div><div class="alimento-info"><div class="alimento-nome">Biraghino 10g</div><div class="alimento-nota">~50 kcal — lo spuntino proteico della dieta</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🥩 Affettati consigliati</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🥩</div><div class="alimento-info"><div class="alimento-nome">Bresaola di manzo</div><div class="alimento-nota">~150 kcal/100g — molto proteica e magra, ottima in molte preparazioni</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🥩</div><div class="alimento-info"><div class="alimento-nome">Prosciutto crudo (sgrassato)</div><div class="alimento-nota">~170 kcal/100g — togliere il grasso visibile, porzione 40g</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🥩</div><div class="alimento-info"><div class="alimento-nome">Prosciutto cotto magro</div><div class="alimento-nota">~130 kcal/100g — scegliere qualità alta con < 3% grassi</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🥩</div><div class="alimento-info"><div class="alimento-nome">Tacchino a fette</div><div class="alimento-nota">~110 kcal/100g — tra i più magri, ottimo alternativo alla bresaola</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🥩</div><div class="alimento-info"><div class="alimento-nome">Mortadella light</div><div class="alimento-nota">Occasionalmente — scegliere la versione ridotta in grassi</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🍞 Pane e prodotti da forno s.g.</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🍞</div><div class="alimento-info"><div class="alimento-nome">Panino senza glutine (50g)</div><div class="alimento-nota">Base della colazione settimanale — scegliere marche con meno additivi possibile</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍞</div><div class="alimento-info"><div class="alimento-nome">Bruschettone / crostini s.g.</div><div class="alimento-nota">Per le colazioni con ricotta, hummus o avocado</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🌾</div><div class="alimento-info"><div class="alimento-nome">Crackers di riso</div><div class="alimento-nota">Leggeri e neutri — ideali con avocado e uova sode</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍪</div><div class="alimento-info"><div class="alimento-nome">Biscotti Magretti Galbusera</div><div class="alimento-nota">1 pacchettino (25g) a colazione con caffelatte — già nel piano</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🫓</div><div class="alimento-info"><div class="alimento-nome">Pane di grano saraceno / miglio</div><div class="alimento-nota">Alternativa per varietà — in piccole porzioni (40–50g)</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🍎 Frutta consigliata</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🍎</div><div class="alimento-info"><div class="alimento-nome">Mela, pera, arancia, mandarino</div><div class="alimento-nota">Frutti di stagione preferiti — ~80 kcal/frutto, sbucciare sempre</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🫐</div><div class="alimento-info"><div class="alimento-nome">Frutti di bosco</div><div class="alimento-nota">Mirtilli, fragole, lamponi — bassi indice glicemico, ottimi anche come dessert</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍑</div><div class="alimento-info"><div class="alimento-nome">Pesche, albicocche, prugne</div><div class="alimento-nota">Frutta estiva — 1 frutto medio come spuntino</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍌</div><div class="alimento-info"><div class="alimento-nome">Banana</div><div class="alimento-nota">Più calorica (~90 kcal) — occasionalmente o dopo l'attività fisica</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍇</div><div class="alimento-info"><div class="alimento-nome">Uva</div><div class="alimento-nota">Alto contenuto di zuccheri — piccole porzioni (100g)</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🥜 Frutta secca (extra sotto 1100 kcal)</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🥜</div><div class="alimento-info"><div class="alimento-nome">Mandorle</div><div class="alimento-nota">Preferita nel piano — 5 mandorle a colazione, o 15g come extra serale</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🌰</div><div class="alimento-info"><div class="alimento-nome">Noci</div><div class="alimento-nota">Ricche di omega-3 — 3–4 noci come porzione, usate anche negli Spatzle</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🥜</div><div class="alimento-info"><div class="alimento-nome">Anacardi, nocciole</div><div class="alimento-nota">Valide alternative — sempre 15g totali come da piano</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🥚 Proteine base</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🥚</div><div class="alimento-info"><div class="alimento-nome">Uova (2 a porzione)</div><div class="alimento-nota">In padella, strapazzate o sode — base di molte colazioni e cene</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🐟</div><div class="alimento-info"><div class="alimento-nome">Tonno al naturale (80–120g)</div><div class="alimento-nota">In scatola al naturale — non sott'olio. Base di pranzi e bowl</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🐟</div><div class="alimento-info"><div class="alimento-nome">Salmone affumicato (50g)</div><div class="alimento-nota">A colazione o pranzo — ottima fonte di omega-3</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🍗</div><div class="alimento-info"><div class="alimento-nome">Pollo alla piastra (120g)</div><div class="alimento-nota">Petto preferibilmente — senza pelle, condire con erbe aromatiche</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🐄</div><div class="alimento-info"><div class="alimento-nome">Manzo magro — tartare e carpaccio (120g)</div><div class="alimento-nota">Preferire tagli magri: fesa, girello, filetto</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🐟</div><div class="alimento-info"><div class="alimento-nome">Sogliola / orata (150g)</div><div class="alimento-nota">Pesce bianco magro ideale — al forno o al vapore</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+    </div>
+  </div>
+
+  <div class="alimenti-section">
+    <div class="alimenti-section-title">🥑 Grassi buoni</div>
+    <div class="alimenti-grid">
+      <div class="alimento-card"><div class="alimento-icon">🥑</div><div class="alimento-info"><div class="alimento-nome">Avocado (½ al giorno)</div><div class="alimento-nota">~160 kcal per metà — usarne al massimo ½ per pasto</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🫒</div><div class="alimento-info"><div class="alimento-nome">Olio EVO</div><div class="alimento-nota">1 cucchiaio per condire — preferire a crudo</div></div><span class="alimento-badge badge-ok">✓ Sì</span></div>
+      <div class="alimento-card"><div class="alimento-icon">🫒</div><div class="alimento-info"><div class="alimento-nome">Olive</div><div class="alimento-nota">Nelle insalate — 5–6 olive come porzione, non eccedere per il sale</div></div><span class="alimento-badge badge-mod">⚠ Moderazione</span></div>
+    </div>
+  </div>
+
+  <div style="height: 8px;"></div>
 </div>
 
 <!-- NAV -->
@@ -952,6 +1110,12 @@
     </svg>
     Coach
   </button>
+  <button class="nav-btn" onclick="showScreen('alimenti', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M2 22l10-10M16 8c0 0-1.5-6-8-6 0 6.5 4 9 8 9s8-2.5 8-9c-6.5 0-8 6-8 6"/>
+    </svg>
+    Alimenti
+  </button>
   <button class="nav-btn" onclick="showScreen('spesa', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
@@ -977,80 +1141,171 @@ const KCAL_TARGET = 1450;
 let currentWeek = 0;
 let currentDay = 0;
 
-// Pasti fissi (colazione, spuntino, pranzo) — variano per giorno ma non per settimana
-const PRANZI = [
-  { nome: 'Salmone & Avocado', desc: 'Salmone affumicato, avocado, capperi, limone + crackers di riso.', tags: ['s.g.','omega-3'], kcal: 420, ricetta: { ingredienti: ['100g salmone affumicato','½ avocado','capperi','succo di limone','crackers di riso','erba cipollina'], passi: ['Disponi il salmone sul piatto.','Affetta l\'avocado e aggiungi.','Aggiungi capperi e spremi il limone.','Guarnisci con erba cipollina.','Servi con crackers di riso.'] } },
-  { nome: 'Feta & Cetrioli', desc: 'Feta light, cetrioli, olive nere, origano, olio EVO.', tags: ['s.g.','veloce'], kcal: 370, ricetta: { ingredienti: ['80g feta light','1 cetriolo','olive nere','origano','olio EVO','pepe'], passi: ['Taglia il cetriolo a rondelle.','Sbriciola la feta sopra.','Aggiungi olive e origano.','Condisci con olio e pepe.'] } },
-  { nome: 'Caesar Salad leggera', desc: 'Romana, pollo grigliato, parmigiano, dressing yogurt-limone. Senza crostini.', tags: ['s.g.','proteico'], kcal: 410, ricetta: { ingredienti: ['100g petto di pollo','insalata romana','20g parmigiano','yogurt greco light','limone','senape'], passi: ['Griglia il pollo con poco olio.','Prepara dressing: yogurt+limone+senape.','Taglia l\'insalata.','Assembla con il pollo a fette e parmigiano.','Condisci con il dressing.'] } },
-  { nome: 'Lenticchie, feta e pomodori', desc: 'Lenticchie fredde, feta light, pomodorini, cipolla rossa, aceto balsamico.', tags: ['s.g.','fibre'], kcal: 430, ricetta: { ingredienti: ['150g lenticchie cotte','60g feta','100g pomodorini','¼ cipolla rossa','olio EVO','aceto balsamico','basilico'], passi: ['Sciacqua le lenticchie.','Taglia pomodorini e cipolla.','Sbriciola la feta.','Unisci tutto e condisci con olio e aceto.','Guarnisci con basilico.'] } },
-  { nome: 'Insalata di tonno', desc: 'Tonno al naturale, fagiolini, pomodori, olive taggiasche, limone.', tags: ['s.g.','proteico'], kcal: 390, ricetta: { ingredienti: ['120g tonno al naturale','100g fagiolini','1 pomodoro','olive taggiasche','olio EVO','limone'], passi: ['Lessa i fagiolini 8 min, raffredda.','Taglia il pomodoro a spicchi.','Sgocciola il tonno.','Unisci e condisci con olio e limone.','Aggiungi le olive.'] } },
-  { nome: 'Bruschettona pomodori & burrata', desc: 'Pane s.g. tostato, pomodori ramati, burrata (moderazione), basilico, olio EVO.', tags: ['vegetariano'], kcal: 450, ricetta: { ingredienti: ['1 fetta pane s.g.','2 pomodori ramati','50g burrata','basilico','olio EVO','aglio'], passi: ['Tosta il pane.','Strofina l\'aglio sulla superficie.','Condisci i pomodori a cubetti con olio e sale.','Adagia i pomodori sul pane.','Aggiungi la burrata e il basilico.'] } },
-  { nome: 'Quinoa con avocado e gamberi', desc: 'Quinoa fredda, avocado, gamberi, pomodorini, salsa yogurt-limone.', tags: ['s.g.','proteico'], kcal: 440, ricetta: { ingredienti: ['80g quinoa','100g gamberi','½ avocado','100g pomodorini','yogurt greco light','limone','prezzemolo'], passi: ['Cuoci la quinoa, fai raffreddare.','Cuoci i gamberi in padella con aglio 3 min.','Prepara salsa: yogurt+limone+prezzemolo.','Assembla tutto.','Condisci con la salsa.'] } },
-];
+// ─── PIANO NUTRIZIONISTA — 4 settimane complete ───────────────────
+// Ogni giorno ha colazione, spuntino, pranzo e cena propri dell'Excel
 
-// 4 settimane × 7 giorni — solo le CENE variano
 const SETTIMANE = [
   { label: 'Settimana 1', giorni: [
-    { giorno:'Lun', pranzoIdx:0, cena:{ nome:'Peperoni ripieni di macinato', desc:'Peperoni colorati farciti con macinato di tacchino, pomodoro e spezie mediterranee, al forno.', tags:['s.g.','proteico'], kcal:520, ricetta:{ ingredienti:['2 peperoni medi','200g macinato tacchino','1 pomodoro','½ cipolla','aglio, origano, prezzemolo','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Taglia i peperoni a metà, togli i semi.','Soffriggi cipolla e aglio.','Aggiungi macinato, rosola.','Unisci pomodoro e spezie, cuoci 10 min.','Farcisci e inforna 25-30 min.'] } } },
-    { giorno:'Mar', pranzoIdx:1, cena:{ nome:'Quinoa con gamberoni e zucchine', desc:'Quinoa con zucchine grigliate, gamberoni saltati aglio e peperoncino, limone.', tags:['s.g.','proteico'], kcal:490, ricetta:{ ingredienti:['80g quinoa','150g gamberoni','2 zucchine','aglio, peperoncino','olio EVO','limone','prezzemolo'], passi:['Cuoci la quinoa.','Griglia le zucchine.','Salta i gamberoni con aglio e peperoncino 3-4 min.','Unisci tutto.','Servi con limone e prezzemolo.'] } } },
-    { giorno:'Mer', pranzoIdx:2, cena:{ nome:'Pasta s.g. al pesto di rucola e salmone', desc:'Pasta di lenticchie rosse, pesto rucola-noci, salmone al vapore.', tags:['s.g.','omega-3'], kcal:510, ricetta:{ ingredienti:['80g pasta lenticchie rosse','100g salmone fresco','40g rucola','20g noci','aglio','olio EVO','sale'], passi:['Cuoci la pasta al dente.','Frulla rucola, noci, aglio e olio.','Cuoci il salmone a vapore 8-10 min, sminuzza.','Condisci la pasta con il pesto.','Aggiungi il salmone sopra.'] } } },
-    { giorno:'Gio', pranzoIdx:3, cena:{ nome:'Pollo al limone e verdure al forno', desc:'Cosce di pollo marinate al limone e rosmarino, patate dolci e carote al forno.', tags:['s.g.','proteico'], kcal:500, ricetta:{ ingredienti:['200g cosce di pollo','1 patata dolce','2 carote','rosmarino, aglio','succo di 1 limone','olio EVO','sale, pepe'], passi:['Marina il pollo con limone, rosmarino, aglio, olio 30 min.','Preriscalda forno 200°C.','Taglia patata dolce e carote a cubetti.','Metti tutto in teglia.','Inforna 35-40 min, gira a metà.'] } } },
-    { giorno:'Ven', pranzoIdx:4, cena:{ nome:'Parmigiana di zucchine light', desc:'Zucchine grigliate a strati con passata, mozzarella di bufala light e basilico.', tags:['s.g.','vegetariano'], kcal:530, ricetta:{ ingredienti:['3 zucchine grandi','200g passata pomodoro','80g mozzarella bufala light','basilico','aglio','olio EVO'], passi:['Griglia le zucchine a fette.','Scalda la passata con aglio e basilico 10 min.','Strati in pirofila: salsa, zucchine, mozzarella.','Ripeti.','Inforna 180°C per 20 min.'] } } },
-    { giorno:'Sab', pranzoIdx:5, cena:{ nome:'Salmone al cartoccio con asparagi', desc:'Filetto di salmone al cartoccio, asparagi, limone, capperi e aneto.', tags:['s.g.','omega-3'], kcal:560, ricetta:{ ingredienti:['200g filetto salmone','200g asparagi','limone','capperi','aneto fresco','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Stendi carta forno, posa il salmone.','Aggiungi asparagi, limone, capperi, aneto e olio.','Chiudi il cartoccio.','Inforna 18-20 min.'] } } },
-    { giorno:'Dom', pranzoIdx:6, cena:{ nome:'Minestrone detox con uova in camicia', desc:'Minestrone leggero di verdure di stagione con 2 uova in camicia.', tags:['s.g.','vegetariano'], kcal:480, ricetta:{ ingredienti:['1 zucchina','1 carota','1 gambo sedano','1 pomodoro','100g spinaci','brodo vegetale','2 uova freschissime','olio EVO'], passi:['Taglia le verdure a cubetti.','Fai appassire con poco olio 5 min.','Copri con brodo e cuoci 20 min.','Porta acqua a ebollizione con aceto per le uova.','Crea un vortice e immergi le uova, cuoci 3 min.','Servi il minestrone con le uova sopra.'] } } },
+    { giorno:'Lun',
+      colazione:{ nome:'Panino s.g. + prosciutto crudo + formaggio', desc:'Panino senza glutine 50g, prosciutto crudo 40g, formaggio 30g.', tags:['s.g.','proteico'], kcal:340 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Caesar salad con pollo', desc:'Caesar salad con pollo 120g.', tags:['s.g.','proteico'], kcal:430 },
+      cena:     { nome:'Sogliola al forno + verdure grigliate', desc:'Sogliola 150g al forno con verdure grigliate.', tags:['s.g.','pesce'], kcal:320 } },
+    { giorno:'Mar',
+      colazione:{ nome:'Uova in padella + sottiletta + mandorle', desc:'2 uova in padella/strapazzate, sottiletta, 5 mandorle.', tags:['s.g.','proteico'], kcal:260 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Tartare di manzo + insalata', desc:'Tartare di manzo 120g con insalata.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Spatzle verdi con fonduta di Zola e noci', desc:'Spatzle verdi con finta fonduta di Zola e noci.', tags:['s.g.'], kcal:580 } },
+    { giorno:'Mer',
+      colazione:{ nome:'Avocado + salmone affumicato + cracker s.g.', desc:'½ avocado, salmone affumicato 50g, cracker senza glutine.', tags:['s.g.','omega-3'], kcal:350 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Feta + cetrioli + olive', desc:'Feta, cetrioli e olive.', tags:['s.g.','vegetariano'], kcal:320 },
+      cena:     { nome:'Peperoni ripieni di ragù', desc:'Peperoni ripieni di ragù.', tags:['s.g.'], kcal:450 } },
+    { giorno:'Gio',
+      colazione:{ nome:'Bruschettona s.g. + pomodorini + mozzarella', desc:'Bruschettona senza glutine con pomodorini e mozzarella 100g.', tags:['s.g.','vegetariano'], kcal:370 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Insalata di tonno con fagiolini', desc:'Tonno 80g con fagiolini.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Pollo alla piastra + spaghetti di zucchine', desc:'Pollo alla piastra 120g con spaghetti di zucchine.', tags:['s.g.','proteico'], kcal:400 } },
+    { giorno:'Ven',
+      colazione:{ nome:'Crostino s.g. + ricotta + noci + miele', desc:'Crostino senza glutine con ricotta 100g, noci e miele.', tags:['s.g.'], kcal:420 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Involtini di bresaola e caprino', desc:'Bresaola 80g con caprino.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Parmigiana light di zucchine', desc:'Parmigiana leggera di zucchine.', tags:['s.g.','vegetariano'], kcal:450 } },
+    { giorno:'Sab',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Bowl tonno + avocado + cetrioli', desc:'Bowl con tonno 80g, ½ avocado e cetrioli.', tags:['s.g.','proteico'], kcal:450 },
+      cena:     { nome:'Gnocchi di patate al ragù', desc:'Gnocchi di patate 200g al ragù.', tags:['s.g.'], kcal:620 } },
+    { giorno:'Dom',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Carpaccio manzo + funghi + limone', desc:'Carpaccio di manzo 120g con funghi e limone.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Frittata con verdure miste', desc:'Frittata con 2 uova e verdure miste. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:350 } },
   ]},
   { label: 'Settimana 2', giorni: [
-    { giorno:'Lun', pranzoIdx:1, cena:{ nome:'Tacchino in umido con melanzane', desc:'Bocconcini di tacchino in umido con melanzane, pomodorini e olive verdi.', tags:['s.g.','proteico'], kcal:500, ricetta:{ ingredienti:['200g tacchino a bocconcini','1 melanzana','150g pomodorini','olive verdi','aglio, origano','olio EVO','sale, pepe'], passi:['Rosola il tacchino con aglio e olio.','Aggiungi la melanzana a cubetti, cuoci 5 min.','Unisci i pomodorini, olive e origano.','Copri e cuoci a fuoco basso 20 min.','Aggiusta di sale e servi.'] } } },
-    { giorno:'Mar', pranzoIdx:2, cena:{ nome:'Insalata di riso basmati con tonno e verdure', desc:'Riso basmati freddo, tonno al naturale, zucchine grigliate, pomodorini, basilico.', tags:['s.g.','proteico'], kcal:490, ricetta:{ ingredienti:['80g riso basmati','120g tonno al naturale','1 zucchina','100g pomodorini','basilico','olio EVO','limone'], passi:['Cuoci il riso basmati, raffredda.','Griglia la zucchina a rondelle.','Sgocciola il tonno.','Unisci tutto con i pomodorini.','Condisci con olio e limone, guarnisci con basilico.'] } } },
-    { giorno:'Mer', pranzoIdx:3, cena:{ nome:'Pasta s.g. alle vongole e zucchine', desc:'Pasta di mais al dente, vongole fresche, zucchine, aglio, prezzemolo abbondante.', tags:['s.g.','pesce'], kcal:520, ricetta:{ ingredienti:['80g pasta di mais','200g vongole','1 zucchina','2 spicchi aglio','peperoncino','olio EVO','prezzemolo','sale'], passi:['Fai spurgare le vongole in acqua salata 1h.','Cuoci la pasta al dente.','Soffriggi aglio e peperoncino.','Aggiungi le vongole, copri finché si aprono.','Unisci la zucchina saltata e la pasta.','Prezzemolo abbondante.'] } } },
-    { giorno:'Gio', pranzoIdx:4, cena:{ nome:'Filetto di branzino con patate dolci e rosmarino', desc:'Branzino al forno su letto di patate dolci, rosmarino, limone e olio EVO.', tags:['s.g.','pesce'], kcal:510, ricetta:{ ingredienti:['200g filetto branzino','1 patata dolce','rosmarino fresco','1 limone','olio EVO','sale, pepe','timo'], passi:['Preriscalda forno 200°C.','Taglia la patata dolce a rondelle, condisci con olio e rosmarino.','Inforna le patate 15 min.','Posa il branzino sopra, limone, timo, olio.','Inforna altri 15-18 min.'] } } },
-    { giorno:'Ven', pranzoIdx:5, cena:{ nome:'Quinoa con pollo alle erbe e spinaci saltati', desc:'Quinoa tricolore, petto di pollo alle erbe aromatiche, spinaci saltati con aglio.', tags:['s.g.','proteico'], kcal:495, ricetta:{ ingredienti:['80g quinoa tricolore','150g petto di pollo','200g spinaci freschi','rosmarino, timo, aglio','olio EVO','sale, pepe','limone'], passi:['Cuoci la quinoa.','Marina il pollo con erbe, olio e limone.','Griglia il pollo 5-6 min per lato.','Salta gli spinaci con aglio e olio 3 min.','Servi quinoa, pollo a fette e spinaci.'] } } },
-    { giorno:'Sab', pranzoIdx:6, cena:{ nome:'Coda di rospo al forno con verdure mediterranee', desc:'Coda di rospo al forno con pomodorini, capperi, olive nere, origano e olio EVO.', tags:['s.g.','pesce'], kcal:480, ricetta:{ ingredienti:['200g coda di rospo','150g pomodorini','olive nere','capperi','origano','olio EVO','prezzemolo','sale'], passi:['Preriscalda forno 190°C.','Disponi il pesce in teglia.','Aggiungi pomodorini, olive, capperi e origano.','Irrora con olio EVO.','Inforna 20-22 min.','Prezzemolo fresco al momento di servire.'] } } },
-    { giorno:'Dom', pranzoIdx:0, cena:{ nome:'Zuppa di legumi con verdure e crostini s.g.', desc:'Zuppa ricca di ceci, carote, sedano, rosmarino. Crostini di pane senza glutine.', tags:['s.g.','vegetariano'], kcal:460, ricetta:{ ingredienti:['150g ceci cotti','1 carota','1 gambo sedano','½ cipolla','rosmarino','brodo vegetale','olio EVO','pane s.g.'], passi:['Soffriggi cipolla, carota e sedano.','Aggiungi i ceci e il brodo.','Cuoci 20 min, frulla metà della zuppa per renderla cremosa.','Aggiungi rosmarino e cuoci altri 5 min.','Tosta il pane s.g. e servi a parte.'] } } },
+    { giorno:'Lun',
+      colazione:{ nome:'Panino s.g. + bresaola + rucola + grana', desc:'Panino senza glutine 50g, bresaola 80g, rucola e grana 30g.', tags:['s.g.','proteico'], kcal:380 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Bowl tonno + avocado + cetrioli', desc:'Bowl con tonno 80g, ½ avocado e cetrioli.', tags:['s.g.','proteico'], kcal:450 },
+      cena:     { nome:'Orata al forno con asparagi', desc:'Orata 150g al forno con asparagi.', tags:['s.g.','pesce'], kcal:380 } },
+    { giorno:'Mar',
+      colazione:{ nome:'Uova strapazzate + salmone affumicato', desc:'2 uova strapazzate con salmone affumicato 50g.', tags:['s.g.','proteico'], kcal:290 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Involtini di bresaola e caprino', desc:'Bresaola 80g con caprino.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Gnocchi di patate al ragù', desc:'Gnocchi di patate 200g al ragù.', tags:['s.g.'], kcal:620 } },
+    { giorno:'Mer',
+      colazione:{ nome:'Bruschettona s.g. + ricotta + salmone affumicato', desc:'Bruschettona senza glutine con ricotta 100g e salmone affumicato 50g.', tags:['s.g.','omega-3'], kcal:400 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Insalata di lenticchie + feta + pomodori', desc:'Insalata di lenticchie con feta e pomodori.', tags:['s.g.','vegetariano'], kcal:430 },
+      cena:     { nome:'Sogliola al forno + verdure grigliate', desc:'Sogliola 150g al forno con verdure grigliate.', tags:['s.g.','pesce'], kcal:320 } },
+    { giorno:'Gio',
+      colazione:{ nome:'Avocado + uova sode + crackers di riso', desc:'½ avocado, 2 uova sode e crackers di riso.', tags:['s.g.','proteico'], kcal:390 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Bowl tonno + avocado + cetrioli', desc:'Bowl con tonno 80g, ½ avocado e cetrioli.', tags:['s.g.','proteico'], kcal:450 },
+      cena:     { nome:'Pasta s.g. con ricotta e pomodorini', desc:'Pasta senza glutine con ricotta 100g e pomodorini.', tags:['s.g.'], kcal:560 } },
+    { giorno:'Ven',
+      colazione:{ nome:'Crostino s.g. + hummus + pomodorini', desc:'Crostino senza glutine con hummus e pomodorini.', tags:['s.g.','vegetariano'], kcal:300 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Carpaccio manzo + funghi + limone', desc:'Carpaccio di manzo 120g con funghi e limone.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Frittata con zucchine e erbe', desc:'Frittata con 2 uova, zucchine e erbe. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:350 } },
+    { giorno:'Sab',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Insalata di tonno con fagiolini', desc:'Tonno 80g con fagiolini.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Mini rustici patate tonno e olive', desc:'Mini rustici con patate, tonno e olive.', tags:['s.g.'], kcal:520 } },
+    { giorno:'Dom',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Tartare di manzo + insalata', desc:'Tartare di manzo 120g con insalata.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Peperoni ripieni di ragù', desc:'Peperoni ripieni di ragù. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.'], kcal:450 } },
   ]},
   { label: 'Settimana 3', giorni: [
-    { giorno:'Lun', pranzoIdx:2, cena:{ nome:'Pollo tikka masala light', desc:'Pollo marinato allo yogurt e spezie, cotto in salsa di pomodoro speziata, servito con quinoa.', tags:['s.g.','proteico'], kcal:530, ricetta:{ ingredienti:['200g petto pollo','80g quinoa','150g passata pomodoro','yogurt greco','curcuma, cumino, paprika','aglio, zenzero','olio EVO'], passi:['Marina il pollo con yogurt e spezie 30 min.','Cuoci il pollo in padella.','In altra padella soffriggi aglio, zenzero e spezie.','Aggiungi la passata, cuoci 10 min.','Unisci il pollo, cuoci 5 min.','Servi con quinoa.'] } } },
-    { giorno:'Mar', pranzoIdx:3, cena:{ nome:'Pasta s.g. con crema di zucca e pancetta croccante', desc:'Pasta di riso con crema di zucca, pancetta di tacchino croccante e salvia fritta.', tags:['s.g.','comfort'], kcal:525, ricetta:{ ingredienti:['80g pasta di riso','200g zucca','50g pancetta tacchino','4 foglie salvia','½ cipolla','brodo vegetale','olio EVO','noce moscata'], passi:['Cuoci la zucca con cipolla e brodo finché morbida.','Frulla fino a crema liscia, aggiusta di sale e noce moscata.','Rosola la pancetta finché croccante.','Cuoci la pasta al dente.','Condisci con la crema di zucca.','Guarnisci con pancetta e salvia.'] } } },
-    { giorno:'Mer', pranzoIdx:4, cena:{ nome:'Merluzzo al vapore con salsa verde e riso', desc:'Filetto di merluzzo al vapore, salsa verde prezzemolo-capperi-limone, riso basmati.', tags:['s.g.','pesce'], kcal:480, ricetta:{ ingredienti:['200g filetto merluzzo','80g riso basmati','prezzemolo abbondante','capperi','aglio','olio EVO','limone'], passi:['Cuoci il riso basmati.','Cuoci il merluzzo a vapore 8-10 min.','Frulla prezzemolo, capperi, aglio, olio e limone per la salsa.','Servi il merluzzo sul riso.','Versa la salsa verde sopra.'] } } },
-    { giorno:'Gio', pranzoIdx:5, cena:{ nome:'Hamburger di salmone con insalata di cavolo', desc:'Burger di salmone fatto in casa, insalata di cavolo cappuccio con sesamo e salsa allo yogurt.', tags:['s.g.','omega-3'], kcal:510, ricetta:{ ingredienti:['200g salmone fresco','¼ cavolo cappuccio','sesamo tostato','yogurt greco light','limone, senape','erba cipollina','olio EVO'], passi:['Trita il salmone, forma due burger.','Cuoci in padella 3-4 min per lato.','Affetta finemente il cavolo.','Prepara la salsa: yogurt+limone+senape.','Condisci il cavolo con olio e sesamo.','Servi il burger sull\'insalata con la salsa.'] } } },
-    { giorno:'Ven', pranzoIdx:6, cena:{ nome:'Involtini di melanzane con ricotta light e pomodoro', desc:'Melanzane grigliate farcite con ricotta light, erbe aromatiche, al forno con passata.', tags:['s.g.','vegetariano'], kcal:460, ricetta:{ ingredienti:['2 melanzane','150g ricotta light','200g passata pomodoro','basilico, menta','aglio','olio EVO','sale, pepe'], passi:['Griglia le fette di melanzana.','Mescola ricotta con basilico, menta, sale e pepe.','Spalma la ricotta sulle melanzane e arrotola.','Disponi in pirofila con la passata.','Inforna 180°C per 20 min.'] } } },
-    { giorno:'Sab', pranzoIdx:0, cena:{ nome:'Tagliata di manzo con rucola e grana', desc:'Tagliata di manzo magro, rucola fresca, grana a scaglie, limone e olio EVO.', tags:['s.g.','proteico'], kcal:550, ricetta:{ ingredienti:['200g controfiletto manzo','60g rucola','20g grana padano a scaglie','olio EVO','succo di limone','sale grosso','pepe'], passi:['Scalda la griglia al massimo.','Cuoci il manzo 2-3 min per lato (cottura al sangue/media).','Lascia riposare 3 min.','Affetta in diagonale.','Servi su un letto di rucola.','Condisci con olio, limone e scaglie di grana.'] } } },
-    { giorno:'Dom', pranzoIdx:1, cena:{ nome:'Vellutata di zucchine e gamberetti', desc:'Vellutata cremosa di zucchine con gamberetti saltati all\'aglio e crostini di riso.', tags:['s.g.','leggero'], kcal:430, ricetta:{ ingredienti:['3 zucchine','100g gamberetti','½ cipolla','brodo vegetale','olio EVO','aglio','crackers di riso','prezzemolo'], passi:['Soffriggi cipolla e zucchine con olio.','Copri con brodo e cuoci 15 min.','Frulla fino a vellutata liscia.','Salta i gamberetti con aglio e olio 2-3 min.','Servi la vellutata con i gamberetti sopra.','Prezzemolo e crackers di riso a parte.'] } } },
+    { giorno:'Lun',
+      colazione:{ nome:'Panino s.g. + prosciutto crudo + formaggio', desc:'Panino senza glutine 50g, prosciutto crudo 40g, formaggio 30g.', tags:['s.g.','proteico'], kcal:340 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Caesar salad con pollo', desc:'Caesar salad con pollo 120g.', tags:['s.g.','proteico'], kcal:430 },
+      cena:     { nome:'Parmigiana light di melanzane', desc:'Parmigiana leggera di melanzane.', tags:['s.g.','vegetariano'], kcal:450 } },
+    { giorno:'Mar',
+      colazione:{ nome:'Uova in padella + sottiletta + mandorle', desc:'2 uova in padella/strapazzate, sottiletta, 5 mandorle.', tags:['s.g.','proteico'], kcal:260 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Tartare di manzo + insalata', desc:'Tartare di manzo 120g con insalata.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Spatzle verdi con fonduta di Zola e noci', desc:'Spatzle verdi con finta fonduta di Zola e noci.', tags:['s.g.'], kcal:580 } },
+    { giorno:'Mer',
+      colazione:{ nome:'Avocado + salmone affumicato + cracker s.g.', desc:'½ avocado, salmone affumicato 50g, cracker senza glutine.', tags:['s.g.','omega-3'], kcal:350 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Feta + cetrioli + olive', desc:'Feta, cetrioli e olive.', tags:['s.g.','vegetariano'], kcal:320 },
+      cena:     { nome:'Gnocchi di patate al ragù', desc:'Gnocchi di patate 200g al ragù.', tags:['s.g.'], kcal:620 } },
+    { giorno:'Gio',
+      colazione:{ nome:'Bruschettona s.g. + pomodorini + mozzarella', desc:'Bruschettona senza glutine con pomodorini e mozzarella 100g.', tags:['s.g.','vegetariano'], kcal:370 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Involtini di bresaola e caprino', desc:'Bresaola 80g con caprino.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Pollo alla piastra + spaghetti di zucchine', desc:'Pollo alla piastra 120g con spaghetti di zucchine.', tags:['s.g.','proteico'], kcal:400 } },
+    { giorno:'Ven',
+      colazione:{ nome:'Crostino s.g. + ricotta + noci + miele', desc:'Crostino senza glutine con ricotta 100g, noci e miele.', tags:['s.g.'], kcal:420 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Bowl tonno + avocado + cetrioli', desc:'Bowl con tonno 80g, ½ avocado e cetrioli.', tags:['s.g.','proteico'], kcal:450 },
+      cena:     { nome:'Sogliola al forno + verdure grigliate', desc:'Sogliola 150g al forno con verdure grigliate.', tags:['s.g.','pesce'], kcal:320 } },
+    { giorno:'Sab',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Carpaccio manzo + funghi + limone', desc:'Carpaccio di manzo 120g con funghi e limone.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Bruschettona s.g. + pomodorini + mozzarella', desc:'Bruschettona senza glutine con pomodorini e mozzarella 100g. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:370 } },
+    { giorno:'Dom',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Insalata di tonno con fagiolini', desc:'Tonno 80g con fagiolini.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Frittata con verdure e erbe aromatiche', desc:'Frittata con 2 uova, verdure e erbe aromatiche. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:350 } },
   ]},
   { label: 'Settimana 4', giorni: [
-    { giorno:'Lun', pranzoIdx:3, cena:{ nome:'Pollo al curry verde con quinoa', desc:'Bocconcini di pollo in curry verde leggero con latte di cocco light, zucchine, quinoa.', tags:['s.g.','esotico'], kcal:520, ricetta:{ ingredienti:['200g petto pollo','80g quinoa','1 zucchina','100ml latte cocco light','1 cucchiaio curry verde','aglio, zenzero','olio EVO','coriandolo fresco'], passi:['Cuoci la quinoa.','Rosola il pollo con aglio e zenzero.','Aggiungi curry verde e mescola.','Unisci latte di cocco e zucchina a cubetti.','Cuoci 15 min a fuoco medio.','Servi con quinoa e coriandolo fresco.'] } } },
-    { giorno:'Mar', pranzoIdx:4, cena:{ nome:'Pasta s.g. alla Norma light', desc:'Pasta di lenticchie, melanzane al forno, passata di pomodoro aromatica, ricotta salata.', tags:['s.g.','vegetariano'], kcal:510, ricetta:{ ingredienti:['80g pasta lenticchie','1 melanzana','200g passata pomodoro','30g ricotta salata','basilico','aglio','olio EVO','sale'], passi:['Taglia la melanzana a cubetti e arrostisci in forno 200°C per 20 min.','Prepara la salsa con passata, aglio e basilico.','Cuoci la pasta al dente.','Unisci pasta, salsa e melanzane.','Grattugia la ricotta salata sopra.'] } } },
-    { giorno:'Mer', pranzoIdx:5, cena:{ nome:'Orata al forno con finocchi e olive', desc:'Orata intera al forno con finocchi, olive nere, pomodorini, vino bianco e erbe.', tags:['s.g.','pesce'], kcal:490, ricetta:{ ingredienti:['1 orata da 300g','1 finocchio','100g pomodorini','olive nere','50ml vino bianco s.g.','prezzemolo, origano','olio EVO','sale, pepe'], passi:['Preriscalda forno 190°C.','Affetta il finocchio e disponi in teglia.','Posa l\'orata sopra con pomodorini e olive.','Irrora con vino bianco e olio.','Aggiungi erbe, sale e pepe.','Inforna 25-30 min.'] } } },
-    { giorno:'Gio', pranzoIdx:6, cena:{ nome:'Insalata di riso venere con gamberi e avocado', desc:'Riso venere freddo, gamberi cotti, avocado, mango, cetriolo, lime e zenzero.', tags:['s.g.','fresco'], kcal:500, ricetta:{ ingredienti:['80g riso venere','150g gamberi','½ avocado','½ mango','1 cetriolo','succo di lime','zenzero grattugiato','olio EVO'], passi:['Cuoci il riso venere, raffredda bene.','Cuoci i gamberi in padella con poco olio e sale.','Taglia avocado, mango e cetriolo a cubetti.','Mescola tutto con il riso.','Condisci con lime, zenzero e olio EVO.'] } } },
-    { giorno:'Ven', pranzoIdx:0, cena:{ nome:'Polpette di tacchino al sugo con zucchine trifolate', desc:'Polpette di macinato di tacchino in salsa di pomodoro fresca, zucchine trifolate.', tags:['s.g.','proteico'], kcal:515, ricetta:{ ingredienti:['200g macinato tacchino','1 uovo','prezzemolo, aglio','200g passata pomodoro','2 zucchine','olio EVO','sale, pepe'], passi:['Mescola macinato, uovo, prezzemolo, aglio, sale e pepe.','Forma le polpette.','Rosola in padella con poco olio.','Aggiungi la passata e cuoci 15 min.','In altra padella, trifola le zucchine con aglio e olio.','Servi polpette con il sugo e le zucchine.'] } } },
-    { giorno:'Sab', pranzoIdx:1, cena:{ nome:'Branzino in crosta di erbe con purè di cavolfiore', desc:'Filetto di branzino in crosta di erbe al forno, purè leggero di cavolfiore con olio EVO.', tags:['s.g.','pesce'], kcal:495, ricetta:{ ingredienti:['200g filetto branzino','½ cavolfiore','prezzemolo, timo, rosmarino','pangrattato s.g.','olio EVO','aglio','latte vegetale','sale, pepe'], passi:['Cuoci il cavolfiore a vapore finché morbido.','Frulla con olio, latte vegetale, sale — purè.','Mescola erbe tritate con pangrattato s.g. e olio.','Ricopri il branzino con la crosta di erbe.','Inforna 190°C per 15-18 min.','Servi con il purè di cavolfiore.'] } } },
-    { giorno:'Dom', pranzoIdx:2, cena:{ nome:'Risotto di cavolfiore con gamberoni e zafferano', desc:'\"Risotto\" di cavolfiore grattugiato al posto del riso, con gamberoni e zafferano.', tags:['s.g.','leggero'], kcal:450, ricetta:{ ingredienti:['1 cavolfiore grande','150g gamberoni','1 bustina zafferano','½ cipolla','brodo vegetale','olio EVO','prezzemolo','sale, pepe'], passi:['Grattugia il cavolfiore finemente (diventa come riso).','Soffriggi la cipolla, aggiungi il cavolfiore.','Aggiungi brodo gradualmente come un risotto, cuoci 10-12 min.','Unisci lo zafferano.','In padella salta i gamberoni con olio e aglio.','Servi il cavolfiore con i gamberoni sopra.'] } } },
+    { giorno:'Lun',
+      colazione:{ nome:'Panino s.g. + bresaola + rucola + grana', desc:'Panino senza glutine 50g, bresaola 80g, rucola e grana 30g.', tags:['s.g.','proteico'], kcal:380 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Bowl tonno + avocado + cetrioli', desc:'Bowl con tonno 80g, ½ avocado e cetrioli.', tags:['s.g.','proteico'], kcal:450 },
+      cena:     { nome:'Peperoni ripieni di ragù', desc:'Peperoni ripieni di ragù.', tags:['s.g.'], kcal:450 } },
+    { giorno:'Mar',
+      colazione:{ nome:'Uova strapazzate + salmone affumicato', desc:'2 uova strapazzate con salmone affumicato 50g.', tags:['s.g.','proteico'], kcal:290 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Involtini di bresaola e caprino', desc:'Bresaola 80g con caprino.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Mini rustici patate tonno e olive', desc:'Mini rustici con patate, tonno e olive.', tags:['s.g.'], kcal:520 } },
+    { giorno:'Mer',
+      colazione:{ nome:'Avocado + uova sode + crackers di riso', desc:'½ avocado, 2 uova sode e crackers di riso.', tags:['s.g.','proteico'], kcal:390 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Feta + cetrioli + olive', desc:'Feta, cetrioli e olive.', tags:['s.g.','vegetariano'], kcal:320 },
+      cena:     { nome:'Pasta s.g. con ricotta e pomodorini', desc:'Pasta senza glutine con ricotta 100g e pomodorini.', tags:['s.g.'], kcal:560 } },
+    { giorno:'Gio',
+      colazione:{ nome:'Bruschettona s.g. + ricotta + salmone affumicato', desc:'Bruschettona senza glutine con ricotta 100g e salmone affumicato 50g.', tags:['s.g.','omega-3'], kcal:400 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Caesar salad con pollo', desc:'Caesar salad con pollo 120g.', tags:['s.g.','proteico'], kcal:430 },
+      cena:     { nome:'Sogliola al forno + verdure grigliate', desc:'Sogliola 150g al forno con verdure grigliate.', tags:['s.g.','pesce'], kcal:320 } },
+    { giorno:'Ven',
+      colazione:{ nome:'Crostino s.g. + hummus + pomodorini', desc:'Crostino senza glutine con hummus e pomodorini.', tags:['s.g.','vegetariano'], kcal:300 },
+      spuntino: { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero.', tags:['proteico'], kcal:50 },
+      pranzo:   { nome:'Carpaccio manzo + funghi + limone', desc:'Carpaccio di manzo 120g con funghi e limone.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Parmigiana light di zucchine', desc:'Parmigiana leggera di zucchine. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:450 } },
+    { giorno:'Sab',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Tartare di manzo + insalata', desc:'Tartare di manzo 120g con insalata.', tags:['s.g.','proteico'], kcal:300 },
+      cena:     { nome:'Spatzle verdi con fonduta di Zola e noci', desc:'Spatzle verdi con finta fonduta di Zola e noci.', tags:['s.g.'], kcal:580 } },
+    { giorno:'Dom',
+      colazione:{ nome:'Caffelatte + Magretti Galbusera', desc:'Caffelatte con biscotti Magretti Galbusera.', tags:['s.g.'], kcal:250 },
+      spuntino: { nome:'Frutto di stagione', desc:'Frutto di stagione fresco.', tags:['leggero'], kcal:80 },
+      pranzo:   { nome:'Insalata di tonno con fagiolini', desc:'Tonno 80g con fagiolini.', tags:['s.g.','proteico'], kcal:280 },
+      cena:     { nome:'Frittata con verdure miste', desc:'Frittata con 2 uova e verdure miste. +15g frutta secca se sotto 1100 kcal.', tags:['s.g.','vegetariano'], kcal:350 } },
   ]},
-];
-
-const COLAZIONI = [
-  { nome:'Caffè latte + Magretti Galbusera', desc:'Caffè latte 150ml (latte p. scremato) + 1 pacchettino Biscotti Magretti Galbusera (4 biscotti, 25g).', tags:['s.g.'], kcal:165 },
-  { nome:'Caffè latte + Magretti Galbusera', desc:'Caffè latte 150ml + 1 pacchettino Biscotti Magretti Galbusera — la colazione fissa che ami ☕', tags:['s.g.'], kcal:165 },
-];
-const SPUNTINI_OPTIONS = [
-  { nome:'Frutta di stagione', desc:'Una mela, pera o arancia — sbucciata per il Crohn.', tags:['leggero'], kcal:80 },
-  { nome:'Biraghino 10g', desc:'Yogurt Biraghi 10g — proteico e leggero, perfetto a metà mattina.', tags:['proteico'], kcal:45 },
 ];
 
 function getDayMenu(weekIdx, dayIdx) {
   const g = SETTIMANE[weekIdx].giorni[dayIdx];
-  const col = COLAZIONI[dayIdx % 2];
-  const pranzo = PRANZI[g.pranzoIdx];
   const pasti = [
-    { tipo:'Colazione', icon:'☕', ...col, ricetta:null },
-    { tipo:'Spuntino', icon:'🍎', isSnack:true, options: SPUNTINI_OPTIONS },
-    { tipo:'Pranzo', icon:'🥗', ...pranzo },
-    { tipo:'Cena', icon:'🍽️', ...g.cena },
+    { tipo:'Colazione', icon:'☕', ...g.colazione, ricetta:null },
+    { tipo:'Spuntino', icon:'🍎', ...g.spuntino, ricetta:null },
+    { tipo:'Pranzo', icon:'🥗', ...g.pranzo, ricetta:null },
+    { tipo:'Cena', icon:'🍽️', ...g.cena, ricetta:null },
   ];
   // Apply any saved menu edits
   const edits = JSON.parse(localStorage.getItem('erika_menu_edits') || '{}');
   return pasti.map(p => {
-    if (p.isSnack) return p; // snack options don't get edited
     const key = `${weekIdx}_${dayIdx}_${p.tipo}`;
     return edits[key] ? { ...p, ...edits[key] } : p;
   });
@@ -1063,7 +1318,7 @@ function showScreen(name, btn) {
   document.getElementById('screen-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const titles = { home: 'Buongiorno, Erika ✦', dieta: 'Piano alimentare', foto: 'Analisi pasto', coach: 'La tua Coach', spesa: '🛒 Lista della spesa', calorie: '🔥 Diario calorie' };
+  const titles = { home: 'Buongiorno, Erika ✦', dieta: 'Piano alimentare', foto: 'Analisi pasto', coach: 'La tua Coach', spesa: '🛒 Lista della spesa', calorie: '🔥 Diario calorie', alimenti: '🥗 Alimenti consigliati' };
   document.getElementById('screenTitle').textContent = titles[name];
 
   const chatBar = document.querySelector('.chat-input-bar');
@@ -1223,42 +1478,13 @@ function renderDay() {
   const todayMeals = log[todayKey_] || [];
 
   // Total kcal: colazione + pranzo + cena + whichever snack was logged
-  const snackLogged = todayMeals.find(m => m.fonte && m.fonte.startsWith('dieta_Spuntino'));
-  const nonSnackKcal = pasti.filter(p => !p.isSnack).reduce((s,p) => s + p.kcal, 0);
-  const totalKcal = nonSnackKcal + (snackLogged ? snackLogged.kcal : 0);
+  const totalKcal = pasti.reduce((s,p) => s + (p.kcal || 0), 0);
 
   document.getElementById('dietaContent').innerHTML = `
     <div style="padding: 8px 16px 4px; font-size:12px; color:var(--muted);">
       Totale giornaliero stimato: <strong style="color:var(--sage)">${totalKcal} kcal</strong>
     </div>
     ${pasti.map((p, pi) => {
-      if (p.isSnack) {
-        // Render two options side by side
-        return `
-        <div class="meal-block">
-          <div class="meal-header">
-            <div class="meal-icon" style="background:var(--sage-pale)">🍎</div>
-            <div><div class="meal-title">Spuntino</div><div class="meal-kcal">scegli un'opzione</div></div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            ${p.options.map((opt, oi) => {
-              const fonte = `dieta_Spuntino_${oi}`;
-              const logged = todayMeals.some(m => m.fonte === fonte);
-              return `<div class="snack-option ${logged ? 'snack-logged' : ''}">
-                <div class="snack-icon">${oi === 0 ? '🍎' : '🥛'}</div>
-                <div class="snack-name">${opt.nome}</div>
-                <div class="snack-kcal">${opt.kcal} kcal</div>
-                <div class="snack-desc">${opt.desc}</div>
-                <button class="meal-check-btn ${logged ? 'logged' : ''}" style="width:100%;margin-top:8px;"
-                  onclick="toggleSnackLog(${oi},'${opt.nome}',${opt.kcal},this)">
-                  ${logged ? '✓ Mangiato' : '+ Segna'}
-                </button>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>`;
-      }
-
       const alreadyLogged = todayMeals.some(m => m.fonte === `dieta_${p.tipo}`);
       return `
       <div class="meal-block">
@@ -2088,6 +2314,11 @@ function openEditMeal(weekIdx, dayIdx, tipo, nomeAttuale) {
   document.getElementById('editMealInput').value = '';
   document.getElementById('editMealResult').innerHTML = '';
   document.getElementById('editMealSaveBtn').style.display = 'none';
+  // Reset ingredient list
+  document.getElementById('editIngredientsList').innerHTML = '';
+  addIngredientRow();
+  // Reset tabs
+  switchEditTab(1);
   document.getElementById('editMealModal').classList.add('open');
 }
 
@@ -2166,34 +2397,123 @@ function calcKcalLocale(nomePiatto) {
   return { kcal: 420, desc: 'Piatto bilanciato con proteina e verdure', crohn: true };
 }
 
-function calcEditMealKcal() {
-  const nome = document.getElementById('editMealInput').value.trim();
-  if (!nome) { showToast('Scrivi il nome del piatto!'); return; }
+// ─── TAB SWITCHER ─────────────────────────────────────────────────
+let editActiveTab = 1;
+function switchEditTab(n) {
+  editActiveTab = n;
+  document.getElementById('editTabPane1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('editTabPane2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('editTab1').style.background = n === 1 ? 'var(--sage)' : 'transparent';
+  document.getElementById('editTab1').style.color = n === 1 ? 'white' : 'var(--muted)';
+  document.getElementById('editTab1').style.fontWeight = n === 1 ? '600' : 'normal';
+  document.getElementById('editTab2').style.background = n === 2 ? 'var(--sage)' : 'transparent';
+  document.getElementById('editTab2').style.color = n === 2 ? 'white' : 'var(--muted)';
+  document.getElementById('editTab2').style.fontWeight = n === 2 ? '600' : 'normal';
+}
+
+function addIngredientRow(nome='', grammi='') {
+  const list = document.getElementById('editIngredientsList');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+  row.innerHTML = `
+    <input placeholder="Ingrediente (es. pollo)" value="${nome}"
+      style="flex:2;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card);color:var(--charcoal);">
+    <input placeholder="g" type="number" value="${grammi}"
+      style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card);color:var(--charcoal);max-width:70px;">
+    <button onclick="this.parentElement.remove()"
+      style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;">✕</button>`;
+  list.appendChild(row);
+}
+
+function getIngredientsText() {
+  const rows = document.getElementById('editIngredientsList').children;
+  let parts = [];
+  for (const row of rows) {
+    const inputs = row.querySelectorAll('input');
+    const nome = inputs[0].value.trim();
+    const grammi = inputs[1].value.trim();
+    if (nome) parts.push(grammi ? `${nome} ${grammi}g` : nome);
+  }
+  return parts.join(', ');
+}
+
+async function calcEditMealKcal() {
+  let query = '';
+  if (editActiveTab === 1) {
+    query = document.getElementById('editMealInput').value.trim();
+    if (!query) { showToast('Scrivi il nome del piatto!'); return; }
+  } else {
+    query = getIngredientsText();
+    if (!query) { showToast('Aggiungi almeno un ingrediente!'); return; }
+  }
 
   const el = document.getElementById('editMealResult');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div>Calcolo in corso...</div>';
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>AI sta calcolando le calorie...</div>';
   document.getElementById('editMealSaveBtn').style.display = 'none';
 
-  // Piccolo delay per effetto UX
-  setTimeout(() => {
-    const result = calcKcalLocale(nome);
+  const prompt = editActiveTab === 1
+    ? `Sei una nutrizionista esperta. Calcola le calorie per una porzione singola di: "${query}".
+Rispondi SOLO in JSON, niente altro:
+{"kcal": <numero intero>, "nome": "<nome piatto sintetico>", "desc": "<descrizione in 10 parole max>", "crohn_ok": <true|false>}`
+    : `Sei una nutrizionista esperta. Calcola le calorie totali per questo piatto con questi ingredienti: ${query}.
+Considera le porzioni indicate in grammi. Rispondi SOLO in JSON, niente altro:
+{"kcal": <numero intero totale>, "nome": "<nome piatto sintetico>", "desc": "<elenco ingredienti breve>", "crohn_ok": <true|false>}`;
 
-    editContext.calcolatoKcal = result.kcal;
-    editContext.calcolatoNome = nome;
-    editContext.calcolatoDesc = result.desc;
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const json = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    editContext.calcolatoKcal = json.kcal;
+    editContext.calcolatoNome = json.nome || query;
+    editContext.calcolatoDesc = json.desc || '';
+
+    // Mostra il totale aggiornato della giornata
+    const pasti = getDayMenu(editContext.weekIdx, editContext.dayIdx);
+    const altriKcal = pasti.filter(p => p.tipo !== editContext.tipo).reduce((s,p) => s + (p.kcal||0), 0);
+    const nuovoTotale = altriKcal + json.kcal;
 
     el.innerHTML = `
       <div class="ai-response" style="margin-top:0;">
-        <div class="ai-label"><div class="ai-dot"></div>Risultato</div>
+        <div class="ai-label"><div class="ai-dot"></div>Calcolato dall'AI</div>
         <div class="ai-text">
-          <strong>${nome}</strong><br>
-          🔥 <strong>~${result.kcal} kcal</strong> per porzione<br>
-          ${result.desc}<br>
-          ${result.crohn ? '💚 Compatibile con il Crohn' : '⚠️ Attenzione — valuta la tollerabilità per il Crohn'}
+          <strong>${json.nome || query}</strong><br>
+          🔥 <strong>~${json.kcal} kcal</strong> per porzione<br>
+          ${json.desc ? `<span style="color:var(--muted);font-size:12px;">${json.desc}</span><br>` : ''}
+          ${json.crohn_ok ? '💚 Compatibile con il Crohn' : '⚠️ Valuta la tollerabilità per il Crohn'}
+        </div>
+        <div style="margin-top:10px;padding:10px;background:var(--sage-pale);border-radius:10px;border:1px solid var(--sage-light);">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:2px;">Totale giornata con questo pasto</div>
+          <div style="font-size:20px;font-weight:700;color:var(--sage);">${nuovoTotale} kcal</div>
+          <div style="font-size:11px;color:var(--muted);">target: ${KCAL_TARGET} kcal</div>
         </div>
       </div>`;
     document.getElementById('editMealSaveBtn').style.display = 'block';
-  }, 600);
+  } catch(e) {
+    // fallback al database locale
+    const result = calcKcalLocale(editActiveTab === 1 ? query : query.split(',')[0]);
+    editContext.calcolatoKcal = result.kcal;
+    editContext.calcolatoNome = editActiveTab === 1 ? query : 'Piatto personalizzato';
+    editContext.calcolatoDesc = result.desc;
+    el.innerHTML = `
+      <div class="ai-response" style="margin-top:0;">
+        <div class="ai-label"><div class="ai-dot"></div>Stima</div>
+        <div class="ai-text">
+          🔥 <strong>~${result.kcal} kcal</strong> per porzione<br>
+          ${result.desc}
+        </div>
+      </div>`;
+    document.getElementById('editMealSaveBtn').style.display = 'block';
+  }
 }
 
 function saveEditedMeal() {
@@ -2201,7 +2521,7 @@ function saveEditedMeal() {
   if (!calcolatoKcal) return;
   applyMenuEdit(weekIdx, dayIdx, tipo, calcolatoNome, calcolatoDesc, calcolatoKcal);
   closeEditModal();
-  showToast(`✓ ${tipo} aggiornato!`);
+  showToast(`✓ ${tipo} aggiornato — totale giornata ricalcolato!`);
 }
 
 // ─── CONSIGLIO NUTRIZIONALE ───────────────────────────────────────
