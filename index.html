@@ -1089,7 +1089,7 @@ async function callGemini(prompt, system = '') {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'meta-llama/llama-3.1-8b-instruct:free',
+      model: 'meta-llama/llama-3.1-8b-instruct',
       messages,
       max_tokens: 800
     })
@@ -1903,7 +1903,7 @@ Non iniziare mai con "Ciao Erika".`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'meta-llama/llama-3.1-8b-instruct',
         messages,
         max_tokens: 800
       })
@@ -2280,7 +2280,7 @@ async function sendMiniChat(adviceId, nomePasto, kcal) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'meta-llama/llama-3.1-8b-instruct',
         messages,
         max_tokens: 400
       })
