@@ -59,15 +59,15 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .nav-btn {
-    flex: 1; padding: 12px 0 10px;
+    flex: 1; padding: 8px 0 8px;
     border: none; background: none; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px; color: var(--muted);
+    font-size: 9px; color: var(--muted);
     transition: color 0.2s;
   }
   .nav-btn.active { color: var(--sage); }
-  .nav-btn svg { width: 22px; height: 22px; }
+  .nav-btn svg { width: 18px; height: 18px; }
 
   /* HEADER */
   .header {
@@ -274,18 +274,6 @@
   }
   .recipe-btn:hover { background: var(--sage-light); }
 
-  /* FOTO CIBO */
-  .upload-zone {
-    border: 2px dashed var(--sage-light); border-radius: 16px;
-    padding: 40px 20px; text-align: center; cursor: pointer;
-    transition: all 0.2s; background: var(--sage-pale);
-  }
-  .upload-zone:hover { border-color: var(--sage); background: #f9d0e0; }
-  .upload-icon { font-size: 40px; margin-bottom: 10px; }
-  .upload-text { font-size: 14px; color: var(--muted); }
-  .upload-text strong { color: var(--sage); display: block; margin-bottom: 4px; font-size: 16px; }
-  #foto-input { display: none; }
-  .foto-preview { width: 100%; border-radius: 12px; margin-bottom: 12px; max-height: 220px; object-fit: cover; }
 
   /* AI RESPONSE */
   .ai-response {
@@ -800,48 +788,6 @@
   <div id="dietaContent"></div>
 </div>
 
-<!-- SCREEN: FOTO -->
-<div class="screen" id="screen-foto">
-  <div class="card" style="margin-top:16px;">
-    <div class="card-title">📸 Analizza il tuo pasto</div>
-    <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5;">
-      Carica una foto — l'AI stima le calorie e le salva nel tuo diario giornaliero.
-    </p>
-
-    <label for="foto-input">
-      <div class="upload-zone" id="uploadZone">
-        <div class="upload-icon">🥗</div>
-        <div class="upload-text">
-          <strong>Tocca per caricare una foto</strong>
-          Scatta o scegli dalla galleria
-        </div>
-      </div>
-    </label>
-    <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="handleFotoUpload(event)">
-
-    <div id="fotoPreviewWrap" style="display:none; margin-top:12px;">
-      <img id="fotoPreview" class="foto-preview" alt="Anteprima">
-      <div style="display:flex; gap:8px;">
-        <button class="btn-primary" style="flex:1;" onclick="analyzeFood()">Analizza con AI</button>
-        <button class="btn-secondary" onclick="resetFoto()">Cambia</button>
-      </div>
-    </div>
-
-    <div id="fotoAnalysis"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Come funziona</div>
-    <div style="font-size:13px; color:var(--muted); line-height:1.7;">
-      1. Scatta la foto del piatto prima di mangiare<br>
-      2. L'AI stima le calorie e i macronutrienti<br>
-      3. Tocca <strong>Salva nel diario</strong> per registrarle<br>
-      4. Nel tab Calorie vedi il totale giornaliero e settimanale
-    </div>
-  </div>
-</div>
-
-<!-- SCREEN: CALORIE -->
 <div class="screen" id="screen-calorie">
 
   <!-- Oggi -->
@@ -1091,13 +1037,7 @@
     </svg>
     Dieta
   </button>
-  <button class="nav-btn" onclick="showScreen('foto', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-      <circle cx="12" cy="13" r="4"/>
-    </svg>
-    Foto
-  </button>
+
   <button class="nav-btn" onclick="showScreen('calorie', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -1129,7 +1069,6 @@
 <script>
 // ─── STATE ───────────────────────────────────────────────────────
 let pesiLog = JSON.parse(localStorage.getItem('erika_pesi') || '[]');
-let uploadedImageBase64 = null;
 let lastAnalyzedKcal = 0;
 let lastAnalyzedName = '';
 
@@ -1318,7 +1257,7 @@ function showScreen(name, btn) {
   document.getElementById('screen-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const titles = { home: 'Buongiorno, Erika ✦', dieta: 'Piano alimentare', foto: 'Analisi pasto', coach: 'La tua Coach', spesa: '🛒 Lista della spesa', calorie: '🔥 Diario calorie', alimenti: '🥗 Alimenti consigliati' };
+  const titles = { home: 'Buongiorno, Erika ✦', dieta: 'Piano alimentare', coach: 'La tua Coach', spesa: '🛒 Lista della spesa', calorie: '🔥 Diario calorie', alimenti: '🥗 Alimenti consigliati' };
   document.getElementById('screenTitle').textContent = titles[name];
 
   const chatBar = document.querySelector('.chat-input-bar');
@@ -1602,91 +1541,6 @@ function closeModal() {
   document.getElementById('recipeModal').classList.remove('open');
 }
 
-// ─── FOTO ─────────────────────────────────────────────────────────
-function handleFotoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    uploadedImageBase64 = e.target.result.split(',')[1];
-    document.getElementById('fotoPreview').src = e.target.result;
-    document.getElementById('fotoPreviewWrap').style.display = 'block';
-    document.getElementById('uploadZone').style.display = 'none';
-    document.getElementById('fotoAnalysis').innerHTML = '';
-  };
-  reader.readAsDataURL(file);
-}
-
-function resetFoto() {
-  uploadedImageBase64 = null;
-  document.getElementById('fotoPreviewWrap').style.display = 'none';
-  document.getElementById('uploadZone').style.display = 'block';
-  document.getElementById('fotoAnalysis').innerHTML = '';
-  document.getElementById('foto-input').value = '';
-}
-
-async function analyzeFood() {
-  if (!uploadedImageBase64) return;
-  const el = document.getElementById('fotoAnalysis');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div>Analisi in corso...</div>';
-  lastAnalyzedKcal = 0;
-  lastAnalyzedName = '';
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: uploadedImageBase64 } },
-            { type: 'text', text: `Sei un nutrizionista AI per Erika (73 kg → obiettivo 65 kg, morbo di Crohn, dieta low-carb, senza glutine e poco lattosio, pratica padel 3h/settimana). Target calorico giornaliero: 1450 kcal.
-
-Analizza questa foto e rispondi SOLO in italiano con questo formato esatto:
-
-KCAL:[numero intero senza testo]
-🍽️ **Cosa vedo:** [descrizione breve]
-🔥 **Calorie stimate:** [numero] kcal circa
-📊 **Macronutrienti:** Proteine: Xg | Carboidrati: Xg | Grassi: Xg
-✅ **Feedback:** [2-3 righe]
-🌙 **Suggerimento cena:** [consiglio]
-💚 **Crohn check:** [breve commento]
-
-La prima riga KCAL:[numero] è obbligatoria e deve essere il primo testo della risposta.` }
-          ]
-        }]
-      })
-    });
-    const data = await res.json();
-    const text = data.content[0].text;
-
-    // Extract kcal
-    const kcalMatch = text.match(/^KCAL:(\d+)/);
-    if (kcalMatch) lastAnalyzedKcal = parseInt(kcalMatch[1]);
-    const cleanText = text.replace(/^KCAL:\d+\n?/, '');
-
-    // Extract meal name from "Cosa vedo"
-    const nameMatch = cleanText.match(/Cosa vedo[:\s]+([^\n<]+)/);
-    lastAnalyzedName = nameMatch ? nameMatch[1].trim().substring(0, 40) : 'Pasto fotografato';
-
-    el.innerHTML = `
-      <div class="ai-response">
-        <div class="ai-label"><div class="ai-dot"></div>Analisi AI</div>
-        <div class="ai-text">${cleanText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
-      </div>
-      ${lastAnalyzedKcal > 0 ? `
-      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveKcalFromPhoto()">
-        💾 Salva ${lastAnalyzedKcal} kcal nel diario
-      </button>` : ''}
-    `;
-  } catch (err) {
-    el.innerHTML = `<div class="ai-response"><div class="ai-text" style="color:var(--accent)">Errore nell'analisi. Riprova.</div></div>`;
-  }
-}
-
 // ─── TOAST ───────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1701,260 +1555,214 @@ let spesaWeek = 0; // sincronizzata con currentWeek
 const SPESA_SETTIMANE = [
   // ── SETTIMANA 1 ──
   {
-    '🥩 Proteine': [
-      { nome: 'Salmone affumicato', qty: '100g' },
-      { nome: 'Salmone fresco (filetti)', qty: '200g' },
-      { nome: 'Gamberoni', qty: '300g' },
-      { nome: 'Macinato di tacchino', qty: '200g' },
-      { nome: 'Cosce di pollo', qty: '400g' },
-      { nome: 'Tonno al naturale', qty: '1 scatoletta' },
-      { nome: 'Uova', qty: '4' },
+    '🥩 Carne & Pesce': [
+      { nome: 'Sogliola (filetti)', qty: '150g' },
+      { nome: 'Pollo petto (alla piastra)', qty: '120g' },
+      { nome: 'Manzo per tartare/carpaccio', qty: '120g' },
+      { nome: 'Tonno al naturale', qty: '2 scatolette (80g)' },
+      { nome: 'Salmone affumicato', qty: '50g' },
+      { nome: 'Bresaola', qty: '80g' },
+      { nome: 'Prosciutto crudo', qty: '40g' },
     ],
-    '🧀 Latticini & Formaggi': [
-      { nome: 'Feta light', qty: '120g' },
-      { nome: 'Burrata', qty: '1 (125g)' },
-      { nome: 'Mozzarella di bufala light', qty: '80g' },
-      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
+    '🥚 Uova & Latticini': [
+      { nome: 'Uova', qty: '6' },
+      { nome: 'Ricotta vaccina', qty: '100g' },
+      { nome: 'Mozzarella', qty: '100g' },
+      { nome: 'Caprino fresco', qty: '1 rotolino' },
+      { nome: 'Formaggio stagionato (es. fontina)', qty: '30g' },
+      { nome: 'Sottilette light', qty: '1 confezione' },
+      { nome: 'Biraghino Biraghi', qty: '5 vasetti' },
     ],
     '🥑 Frutta & Verdura': [
-      { nome: 'Avocado', qty: '2' },
-      { nome: 'Peperoni rossi e gialli', qty: '4' },
-      { nome: 'Zucchine', qty: '5' },
-      { nome: 'Asparagi', qty: '200g' },
-      { nome: 'Pomodori ramati', qty: '3' },
+      { nome: 'Avocado', qty: '1' },
+      { nome: 'Zucchine', qty: '3' },
+      { nome: 'Peperoni colorati', qty: '2 grandi' },
+      { nome: 'Funghi champignon', qty: '100g' },
+      { nome: 'Cetrioli', qty: '2' },
       { nome: 'Pomodorini', qty: '200g' },
-      { nome: 'Cetrioli', qty: '1' },
-      { nome: 'Insalata romana', qty: '1 cespo' },
-      { nome: 'Spinaci freschi', qty: '100g' },
-      { nome: 'Carote', qty: '2' },
-      { nome: 'Sedano', qty: '1 gambo' },
-      { nome: 'Cipolla bianca', qty: '2' },
-      { nome: 'Patata dolce', qty: '1' },
+      { nome: 'Insalata mista', qty: '1 busta' },
+      { nome: 'Verdure grigliate miste', qty: '200g' },
       { nome: 'Fagiolini', qty: '100g' },
-      { nome: 'Frutta di stagione', qty: 'q.b.' },
-      { nome: 'Limoni', qty: '4' },
+      { nome: 'Frutto di stagione', qty: '5-6 frutti' },
+      { nome: 'Limoni', qty: '2' },
+    ],
+    '🍞 Pane & Carboidrati s.g.': [
+      { nome: 'Panini senza glutine', qty: '2 (50g cad.)' },
+      { nome: 'Bruschettone / crostini s.g.', qty: '1 confezione' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Gnocchi di patate s.g.', qty: '200g' },
     ],
     '🫙 Dispensa': [
-      { nome: 'Quinoa', qty: '160g' },
-      { nome: 'Lenticchie in scatola', qty: '1 barattolo' },
-      { nome: 'Pasta di lenticchie rosse (s.g.)', qty: '80g' },
-      { nome: 'Crackers di riso', qty: '1 confezione' },
-      { nome: 'Pane senza glutine', qty: '1 confezione' },
-      { nome: 'Passata di pomodoro', qty: '200g' },
-      { nome: 'Capperi', qty: 'q.b.' },
-      { nome: 'Olive taggiasche', qty: '50g' },
+      { nome: 'Olive', qty: '50g' },
       { nome: 'Noci', qty: '20g' },
+      { nome: 'Mandorle', qty: '20g' },
+      { nome: 'Miele', qty: 'q.b.' },
+      { nome: 'Hummus (oppure ceci per farlo)', qty: '1 vaschetta' },
+      { nome: 'Passata di pomodoro', qty: '400g' },
       { nome: 'Olio EVO', qty: 'q.b.' },
-      { nome: 'Aceto balsamico', qty: 'q.b.' },
-      { nome: 'Senape', qty: 'q.b.' },
-      { nome: 'Brodo vegetale', qty: '500ml' },
     ],
-    '🌿 Freschi & Aromi': [
-      { nome: 'Aglio', qty: '1 testa' },
-      { nome: 'Basilico fresco', qty: '1 mazzo' },
-      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
-      { nome: 'Rosmarino', qty: '1 rametto' },
-      { nome: 'Aneto fresco', qty: '1 mazzetto' },
-      { nome: 'Erba cipollina', qty: '1 mazzetto' },
-    ],
-    '☕ Colazione & Spuntini': [
+    '☕ Colazione': [
       { nome: 'Caffè', qty: 'q.b.' },
-      { nome: 'Latte parzialmente scremato', qty: '1L' },
-      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
-      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
-      { nome: 'Frutta per spuntino', qty: 'q.b.' },
-      { nome: 'Mandorle', qty: '30g' },
+      { nome: 'Latte p. scremato', qty: '1L' },
+      { nome: 'Biscotti Magretti Galbusera', qty: '2 confezioni' },
     ],
   },
   // ── SETTIMANA 2 ──
   {
-    '🥩 Proteine': [
-      { nome: 'Tacchino a bocconcini', qty: '400g' },
-      { nome: 'Tonno al naturale', qty: '2 scatolette' },
-      { nome: 'Vongole fresche', qty: '400g' },
-      { nome: 'Filetto di branzino', qty: '400g' },
-      { nome: 'Coda di rospo', qty: '200g' },
-      { nome: 'Gamberi', qty: '200g' },
-      { nome: 'Uova', qty: '4' },
+    '🥩 Carne & Pesce': [
+      { nome: 'Orata (filetto)', qty: '150g' },
+      { nome: 'Sogliola (filetti)', qty: '150g' },
+      { nome: 'Tonno al naturale', qty: '3 scatolette (80g)' },
+      { nome: 'Salmone affumicato', qty: '100g' },
+      { nome: 'Manzo per tartare/carpaccio', qty: '120g' },
+      { nome: 'Bresaola', qty: '160g' },
+      { nome: 'Prosciutto crudo (per panino)', qty: '40g' },
     ],
-    '🧀 Latticini & Formaggi': [
-      { nome: 'Feta light', qty: '80g' },
-      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
-      { nome: 'Parmigiano a scaglie', qty: '20g' },
+    '🥚 Uova & Latticini': [
+      { nome: 'Uova', qty: '6' },
+      { nome: 'Ricotta vaccina', qty: '100g' },
+      { nome: 'Feta', qty: '80g' },
+      { nome: 'Caprino fresco', qty: '1 rotolino' },
+      { nome: 'Biraghino Biraghi', qty: '5 vasetti' },
     ],
     '🥑 Frutta & Verdura': [
-      { nome: 'Avocado', qty: '1' },
-      { nome: 'Melanzane', qty: '2' },
-      { nome: 'Zucchine', qty: '3' },
-      { nome: 'Pomodorini', qty: '300g' },
-      { nome: 'Insalata romana', qty: '1 cespo' },
-      { nome: 'Spinaci', qty: '100g' },
-      { nome: 'Patata dolce', qty: '2' },
-      { nome: 'Carote', qty: '2' },
-      { nome: 'Finocchio', qty: '1' },
-      { nome: 'Cipolla bianca e rossa', qty: '2' },
-      { nome: 'Cetrioli', qty: '1' },
-      { nome: 'Frutta di stagione', qty: 'q.b.' },
-      { nome: 'Limoni', qty: '4' },
+      { nome: 'Avocado', qty: '2' },
+      { nome: 'Asparagi', qty: '200g' },
+      { nome: 'Zucchine', qty: '2' },
+      { nome: 'Cetrioli', qty: '2' },
+      { nome: 'Pomodorini', qty: '200g' },
+      { nome: 'Funghi champignon', qty: '100g' },
+      { nome: 'Fagiolini', qty: '100g' },
+      { nome: 'Insalata mista', qty: '1 busta' },
+      { nome: 'Lenticchie (secche o in scatola)', qty: '150g cotte' },
+      { nome: 'Frutto di stagione', qty: '5-6 frutti' },
+      { nome: 'Limoni', qty: '2' },
+    ],
+    '🍞 Pane & Carboidrati s.g.': [
+      { nome: 'Panini senza glutine', qty: '1 (50g)' },
+      { nome: 'Bruschettone / crostini s.g.', qty: '1 confezione' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Gnocchi di patate s.g.', qty: '200g' },
+      { nome: 'Pasta senza glutine', qty: '80g' },
     ],
     '🫙 Dispensa': [
-      { nome: 'Riso basmati (s.g.)', qty: '160g' },
-      { nome: 'Pasta di mais (s.g.)', qty: '80g' },
-      { nome: 'Quinoa', qty: '80g' },
-      { nome: 'Ceci in scatola', qty: '1 barattolo' },
-      { nome: 'Crackers di riso', qty: '1 confezione' },
-      { nome: 'Pane senza glutine', qty: '1 confezione' },
-      { nome: 'Olive nere', qty: '50g' },
-      { nome: 'Capperi', qty: 'q.b.' },
-      { nome: 'Vino bianco s.g.', qty: '100ml' },
+      { nome: 'Olive', qty: '50g' },
+      { nome: 'Noci', qty: '20g' },
+      { nome: 'Mandorle', qty: '20g' },
+      { nome: 'Hummus', qty: '1 vaschetta' },
+      { nome: 'Passata di pomodoro', qty: '400g' },
       { nome: 'Olio EVO', qty: 'q.b.' },
-      { nome: 'Brodo vegetale', qty: '500ml' },
     ],
-    '🌿 Freschi & Aromi': [
-      { nome: 'Aglio', qty: '1 testa' },
-      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
-      { nome: 'Basilico fresco', qty: '1 mazzo' },
-      { nome: 'Rosmarino', qty: '1 rametto' },
-      { nome: 'Timo fresco', qty: '1 mazzetto' },
-      { nome: 'Origano secco', qty: 'q.b.' },
-    ],
-    '☕ Colazione & Spuntini': [
+    '☕ Colazione': [
       { nome: 'Caffè', qty: 'q.b.' },
       { nome: 'Latte p. scremato', qty: '1L' },
-      
-      
-      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
-      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
-      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+      { nome: 'Biscotti Magretti Galbusera', qty: '2 confezioni' },
     ],
   },
   // ── SETTIMANA 3 ──
   {
-    '🥩 Proteine': [
-      { nome: 'Petto di pollo', qty: '400g' },
-      { nome: 'Salmone fresco', qty: '400g' },
-      { nome: 'Filetto di merluzzo', qty: '200g' },
-      { nome: 'Controfiletto di manzo magro', qty: '200g' },
-      { nome: 'Gamberi', qty: '100g' },
-      { nome: 'Uova', qty: '4' },
+    '🥩 Carne & Pesce': [
+      { nome: 'Sogliola (filetti)', qty: '150g' },
+      { nome: 'Pollo petto (alla piastra)', qty: '120g' },
+      { nome: 'Manzo per tartare/carpaccio', qty: '240g' },
+      { nome: 'Tonno al naturale', qty: '2 scatolette (80g)' },
+      { nome: 'Salmone affumicato', qty: '100g' },
+      { nome: 'Bresaola', qty: '80g' },
+      { nome: 'Prosciutto crudo', qty: '40g' },
     ],
-    '🧀 Latticini & Formaggi': [
-      { nome: 'Yogurt greco light (Biraghi)', qty: '5 vasetti' },
-      { nome: 'Ricotta light', qty: '150g' },
-      { nome: 'Feta light', qty: '80g' },
-      { nome: 'Grana Padano a scaglie', qty: '20g' },
+    '🥚 Uova & Latticini': [
+      { nome: 'Uova', qty: '8' },
+      { nome: 'Ricotta vaccina', qty: '100g' },
+      { nome: 'Mozzarella', qty: '100g' },
+      { nome: 'Feta', qty: '80g' },
+      { nome: 'Caprino fresco', qty: '1 rotolino' },
+      { nome: 'Sottilette light', qty: '1 confezione' },
+      { nome: 'Biraghino Biraghi', qty: '5 vasetti' },
     ],
     '🥑 Frutta & Verdura': [
       { nome: 'Avocado', qty: '1' },
-      { nome: 'Zucchine', qty: '4' },
-      { nome: 'Melanzane', qty: '2' },
+      { nome: 'Zucchine', qty: '3' },
+      { nome: 'Melanzane', qty: '1' },
+      { nome: 'Peperoni colorati', qty: '2 grandi' },
+      { nome: 'Funghi champignon', qty: '100g' },
+      { nome: 'Cetrioli', qty: '2' },
       { nome: 'Pomodorini', qty: '200g' },
-      { nome: 'Cavolo cappuccio', qty: '¼' },
-      { nome: 'Spinaci', qty: '100g' },
-      { nome: 'Rucola', qty: '60g' },
-      { nome: 'Cipolla bianca', qty: '2' },
-      { nome: 'Cetrioli', qty: '1' },
-      { nome: 'Sesamo tostato', qty: '10g' },
-      { nome: 'Frutta di stagione', qty: 'q.b.' },
-      { nome: 'Limoni', qty: '4' },
+      { nome: 'Insalata mista', qty: '1 busta' },
+      { nome: 'Fagiolini', qty: '100g' },
+      { nome: 'Frutto di stagione', qty: '5-6 frutti' },
+      { nome: 'Limoni', qty: '2' },
+    ],
+    '🍞 Pane & Carboidrati s.g.': [
+      { nome: 'Panini senza glutine', qty: '2 (50g cad.)' },
+      { nome: 'Bruschettone / crostini s.g.', qty: '1 confezione' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Gnocchi di patate s.g.', qty: '200g' },
     ],
     '🫙 Dispensa': [
-      { nome: 'Quinoa', qty: '80g' },
-      { nome: 'Pasta di riso (s.g.)', qty: '80g' },
-      { nome: 'Crackers di riso', qty: '1 confezione' },
-      { nome: 'Pane senza glutine', qty: '1 confezione' },
+      { nome: 'Olive', qty: '50g' },
+      { nome: 'Noci', qty: '20g' },
+      { nome: 'Mandorle', qty: '20g' },
+      { nome: 'Miele', qty: 'q.b.' },
       { nome: 'Passata di pomodoro', qty: '200g' },
-      { nome: 'Curcuma, cumino, paprika', qty: 'q.b.' },
-      { nome: 'Zenzero fresco', qty: '1 pezzetto' },
-      { nome: 'Capperi', qty: 'q.b.' },
       { nome: 'Olio EVO', qty: 'q.b.' },
-      { nome: 'Senape', qty: 'q.b.' },
     ],
-    '🌿 Freschi & Aromi': [
-      { nome: 'Aglio', qty: '1 testa' },
-      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
-      { nome: 'Basilico fresco', qty: '1 mazzo' },
-      { nome: 'Menta fresca', qty: '1 mazzetto' },
-      { nome: 'Coriandolo fresco', qty: '1 mazzetto' },
-      { nome: 'Rosmarino', qty: '1 rametto' },
-      { nome: 'Timo fresco', qty: '1 mazzetto' },
-    ],
-    '☕ Colazione & Spuntini': [
+    '☕ Colazione': [
       { nome: 'Caffè', qty: 'q.b.' },
       { nome: 'Latte p. scremato', qty: '1L' },
-      
-      
-      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
-      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
-      { nome: 'Frutta per spuntino', qty: 'q.b.' },
-      { nome: 'Mandorle', qty: '30g' },
+      { nome: 'Biscotti Magretti Galbusera', qty: '2 confezioni' },
     ],
   },
   // ── SETTIMANA 4 ──
   {
-    '🥩 Proteine': [
-      { nome: 'Petto di pollo', qty: '200g' },
-      { nome: 'Macinato di tacchino', qty: '200g' },
-      { nome: 'Orata intera', qty: '1 (300g)' },
-      { nome: 'Filetto di branzino', qty: '200g' },
-      { nome: 'Gamberoni', qty: '300g' },
-      { nome: 'Uova', qty: '3' },
+    '🥩 Carne & Pesce': [
+      { nome: 'Sogliola (filetti)', qty: '150g' },
+      { nome: 'Manzo per tartare/carpaccio', qty: '120g' },
+      { nome: 'Tonno al naturale', qty: '2 scatolette (80g)' },
+      { nome: 'Salmone affumicato', qty: '100g' },
+      { nome: 'Bresaola', qty: '160g' },
+      { nome: 'Prosciutto crudo', qty: '40g' },
     ],
-    '🧀 Latticini & Formaggi': [
-      { nome: 'Yogurt greco light (Biraghi)', qty: '4 vasetti' },
-      { nome: 'Ricotta salata', qty: '30g' },
-      { nome: 'Latte vegetale (per purè)', qty: '100ml' },
-      { nome: 'Feta light', qty: '80g' },
+    '🥚 Uova & Latticini': [
+      { nome: 'Uova', qty: '8' },
+      { nome: 'Ricotta vaccina', qty: '100g' },
+      { nome: 'Feta', qty: '80g' },
+      { nome: 'Caprino fresco', qty: '1 rotolino' },
+      { nome: 'Biraghino Biraghi', qty: '5 vasetti' },
     ],
     '🥑 Frutta & Verdura': [
-      { nome: 'Avocado', qty: '2' },
-      { nome: 'Mango', qty: '1' },
-      { nome: 'Cetriolo', qty: '2' },
-      { nome: 'Melanzane', qty: '1' },
+      { nome: 'Avocado', qty: '1' },
       { nome: 'Zucchine', qty: '2' },
-      { nome: 'Cavolfiore', qty: '1 grande' },
-      { nome: 'Finocchio', qty: '1' },
+      { nome: 'Peperoni colorati', qty: '2 grandi' },
+      { nome: 'Funghi champignon', qty: '100g' },
+      { nome: 'Cetrioli', qty: '2' },
       { nome: 'Pomodorini', qty: '200g' },
-      { nome: 'Cipolla bianca', qty: '2' },
-      { nome: 'Insalata romana', qty: '1 cespo' },
-      { nome: 'Frutta di stagione', qty: 'q.b.' },
-      { nome: 'Limoni + lime', qty: '3+2' },
+      { nome: 'Insalata mista', qty: '1 busta' },
+      { nome: 'Fagiolini', qty: '100g' },
+      { nome: 'Frutto di stagione', qty: '5-6 frutti' },
+      { nome: 'Limoni', qty: '2' },
+    ],
+    '🍞 Pane & Carboidrati s.g.': [
+      { nome: 'Panini senza glutine', qty: '2 (50g cad.)' },
+      { nome: 'Bruschettone / crostini s.g.', qty: '1 confezione' },
+      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Pasta senza glutine', qty: '80g' },
+      { nome: 'Spatzle verdi s.g.', qty: '1 confezione' },
     ],
     '🫙 Dispensa': [
-      { nome: 'Quinoa', qty: '80g' },
-      { nome: 'Riso venere (s.g.)', qty: '80g' },
-      { nome: 'Pasta di lenticchie (s.g.)', qty: '80g' },
-      { nome: 'Crackers di riso', qty: '1 confezione' },
+      { nome: 'Olive', qty: '50g' },
+      { nome: 'Noci', qty: '20g' },
+      { nome: 'Mandorle', qty: '15g' },
+      { nome: 'Gorgonzola (Zola per Spatzle)', qty: '40g' },
       { nome: 'Passata di pomodoro', qty: '200g' },
-      { nome: 'Pangrattato senza glutine', qty: '30g' },
-      { nome: 'Latte di cocco light', qty: '100ml' },
-      { nome: 'Curry verde in pasta', qty: '1 vasetto' },
-      { nome: 'Zafferano', qty: '1 bustina' },
-      { nome: 'Olive nere', qty: '50g' },
-      { nome: 'Capperi', qty: 'q.b.' },
       { nome: 'Olio EVO', qty: 'q.b.' },
-      { nome: 'Brodo vegetale', qty: '500ml' },
     ],
-    '🌿 Freschi & Aromi': [
-      { nome: 'Aglio', qty: '1 testa' },
-      { nome: 'Zenzero fresco', qty: '1 pezzetto' },
-      { nome: 'Coriandolo fresco', qty: '1 mazzetto' },
-      { nome: 'Prezzemolo fresco', qty: '1 mazzo' },
-      { nome: 'Timo fresco', qty: '1 mazzetto' },
-      { nome: 'Rosmarino', qty: '1 rametto' },
-      { nome: 'Origano secco', qty: 'q.b.' },
-    ],
-    '☕ Colazione & Spuntini': [
+    '☕ Colazione': [
       { nome: 'Caffè', qty: 'q.b.' },
       { nome: 'Latte p. scremato', qty: '1L' },
-      
-      
-      { nome: 'Biscotti Magretti Galbusera', qty: '7 pacchettini' },
-      { nome: 'Yogurt Biraghi', qty: '3 vasetti' },
-      { nome: 'Frutta per spuntino', qty: 'q.b.' },
+      { nome: 'Biscotti Magretti Galbusera', qty: '2 confezioni' },
     ],
   },
-];
+]
 
 let spesaChecked = JSON.parse(localStorage.getItem('erika_spesa_checked') || '{}');
 
@@ -2197,9 +2005,6 @@ function saveKcalFromPhoto() {
   log[key].push({ nome: lastAnalyzedName, kcal: lastAnalyzedKcal, ora: timeStr });
   saveKcalLog(log);
   showToast(`✓ ${lastAnalyzedKcal} kcal salvate nel diario!`);
-  // Update save button
-  const btn = document.querySelector('#fotoAnalysis .btn-primary');
-  if (btn) { btn.textContent = '✓ Salvato!'; btn.disabled = true; btn.style.opacity = '0.6'; }
 }
 
 function saveManualKcal() {
@@ -2252,7 +2057,7 @@ function renderCalorieDiary() {
   // Meals list
   const list = document.getElementById('kcalMealsList');
   if (todayMeals.length === 0) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Nessun pasto registrato oggi. Carica una foto o aggiungi manualmente!</div>';
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Nessun pasto registrato oggi — aggiungi manualmente dal piano dieta!</div>';
   } else {
     list.innerHTML = todayMeals.map((m, i) => `
       <div class="kcal-meal-row">
@@ -2452,12 +2257,15 @@ async function calcEditMealKcal() {
   document.getElementById('editMealSaveBtn').style.display = 'none';
 
   const prompt = editActiveTab === 1
-    ? `Sei una nutrizionista esperta. Calcola le calorie per una porzione singola di: "${query}".
+    ? `Sei una nutrizionista esperta. Calcola le calorie ESATTE per: "${query}".
+REGOLA FONDAMENTALE: se nel testo è indicata una quantità in grammi (es. "10g anacardi", "50g riso", "2 uova"), calcola le calorie SOLO per quella quantità precisa — NON per una porzione standard.
+Se non è indicata alcuna grammatura, calcola per una porzione tipica da pasto singolo.
 Rispondi SOLO in JSON, niente altro:
-{"kcal": <numero intero>, "nome": "<nome piatto sintetico>", "desc": "<descrizione in 10 parole max>", "crohn_ok": <true|false>}`
-    : `Sei una nutrizionista esperta. Calcola le calorie totali per questo piatto con questi ingredienti: ${query}.
-Considera le porzioni indicate in grammi. Rispondi SOLO in JSON, niente altro:
-{"kcal": <numero intero totale>, "nome": "<nome piatto sintetico>", "desc": "<elenco ingredienti breve>", "crohn_ok": <true|false>}`;
+{"kcal": <numero intero>, "nome": "<nome sintetico>", "desc": "<quantità usata + alimento>", "crohn_ok": <true|false>}`
+    : `Sei una nutrizionista esperta. Calcola le calorie TOTALI sommando ogni ingrediente con la sua grammatura esatta: ${query}.
+Per ogni ingrediente usa esattamente i grammi indicati, non le porzioni standard.
+Rispondi SOLO in JSON, niente altro:
+{"kcal": <numero intero totale>, "nome": "<nome piatto sintetico>", "desc": "<ingredienti con grammi>", "crohn_ok": <true|false>}`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
