@@ -1077,20 +1077,26 @@ function showScreen(name, btn) {
 }
 
 // ─── GEMINI API ───────────────────────────────────────────────────
-const GEMINI_KEY = 'AIzaSyAQ.Ab8RN6JzmbZm5AJZlusUJiSW-LNkUe47BSaFL_hyD5cgM2AsdA';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const OR_KEY = ''; // chiave gestita dal worker Cloudflare
+const OR_URL = 'https://erika-proxy.erikapasto.workers.dev';
 
-async function callGemini(prompt) {
-  const res = await fetch(GEMINI_URL, {
+async function callGemini(prompt, system = '') {
+  const messages = [];
+  if (system) messages.push({ role: 'system', content: system });
+  messages.push({ role: 'user', content: prompt });
+
+  const res = await fetch(OR_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { maxOutputTokens: 1000 }
+      model: 'meta-llama/llama-3.1-8b-instruct:free',
+      messages,
+      max_tokens: 800
     })
   });
   const data = await res.json();
-  return data.candidates[0].content.parts[0].text;
+  if (data.error) throw new Error(data.error.message);
+  return data.choices[0].message.content;
 }
 
 // ─── MOTIVATION ───────────────────────────────────────────────────
@@ -1098,8 +1104,7 @@ async function loadMotivation() {
   const el = document.getElementById('motivQuote');
   el.textContent = '...';
   try {
-    const text = await callGemini(`Sei un coach di benessere personale per Erika, che vuole perdere 8 kg (da 73 a 65 kg), pratica padel 3 ore a settimana e ha il morbo di Crohn. 
-Genera UN messaggio motivazionale breve (massimo 2 frasi), caldo, personale, in italiano. Può essere ispirazionale, pratico o simpatico. Varia ogni volta. Non iniziare con "Ciao" o "Erika". Solo il messaggio, niente altro.`);
+    const text = await callGemini(`Genera UN messaggio motivazionale breve (massimo 2 frasi), caldo, personale, in italiano per Erika che vuole perdere 8 kg (da 73 a 65 kg), pratica padel 3 ore a settimana e ha il morbo di Crohn. Può essere ispirazionale, pratico o simpatico. Varia ogni volta. Non iniziare con "Ciao" o "Erika". Solo il messaggio, niente altro.`);
     el.textContent = text.trim();
   } catch {
     const fallback = [
@@ -1890,23 +1895,22 @@ Stile: calda, empatica, mai giudicante, italiana, come un'amica. Rispondi in max
 Non iniziare mai con "Ciao Erika".`;
 
   try {
-    // Build Gemini conversation history
-    const geminiContents = chatHistory.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
+    const messages = [];
+    messages.push({ role: 'system', content: systemPrompt });
+    chatHistory.forEach(m => messages.push(m));
 
-    const res = await fetch(GEMINI_URL, {
+    const res = await fetch(OR_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: geminiContents,
-        generationConfig: { maxOutputTokens: 1000 }
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages,
+        max_tokens: 800
       })
     });
     const data = await res.json();
-    const reply = data.candidates[0].content.parts[0].text;
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.choices[0].message.content;
     removeTyping();
 
     // Check for menu edit JSON
@@ -2202,7 +2206,6 @@ function saveEditedMeal() {
 
 // ─── CONSIGLIO NUTRIZIONALE ───────────────────────────────────────
 async function getMealAdvice(nomePasto, tipo, kcal, btn) {
-  // Toggle: se il consiglio è già visibile, nascondilo
   const card = btn.closest('.meal-card');
   const adviceEl = card.querySelector('.meal-advice');
   if (adviceEl.classList.contains('visible')) {
@@ -2217,28 +2220,89 @@ async function getMealAdvice(nomePasto, tipo, kcal, btn) {
   const currentWeight = pesiLog.length > 0 ? pesiLog[pesiLog.length - 1].peso : 73;
 
   try {
-    const prompt = `Sei una nutrizionista esperta che conosce bene Erika: pesa ${currentWeight}kg, vuole arrivare a 65kg, ha il morbo di Crohn (deve evitare glutine e limitare lattosio), segue una dieta low-carb, fa padel 3h/settimana. Target calorico: 1450 kcal/giorno.
+    const testo = await callGemini(
+      `Sei una nutrizionista esperta. Erika: pesa ${currentWeight}kg, obiettivo 65kg, morbo di Crohn (no glutine, poco lattosio), dieta low-carb, padel 3h/sett, target 1450 kcal/giorno.
 
-Erika sta per mangiare: "${nomePasto}" (${tipo}, ~${kcal} kcal).
+Sta per mangiare: "${nomePasto}" (${tipo}, ~${kcal} kcal).
 
-Dammi 2-3 consigli pratici e personalizzati in italiano su questo piatto. Puoi suggerire:
-- Quantità ideale di proteine/carboidrati/verdure
-- Modifiche per renderlo più Crohn-friendly
-- Come bilanciarlo con gli altri pasti della giornata
-- Sostituzioni o aggiunte utili
+Dai 2-3 consigli pratici in italiano su questo piatto: quantità ideali, modifiche Crohn-friendly, come bilanciarlo. Massimo 4 righe, tono amichevole.`
+    );
 
-Sii concisa, diretta e incoraggiante. Usa massimo 4 righe. Non iniziare con "Ciao".`;
-
-    const testo = await callGemini(prompt);
-    adviceEl.innerHTML = testo.trim().replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+    const adviceId = 'adv_' + Math.random().toString(36).substr(2,6);
+    adviceEl.innerHTML = `
+      <div style="margin-bottom:10px;">${testo.trim().replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>')}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Hai altre domande su questo piatto?</div>
+      <div id="minichat_${adviceId}" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:6px;">
+        <input id="miniinput_${adviceId}" class="kcal-manual-input" placeholder="Es. Che formaggio al posto della feta?" style="flex:1;padding:8px 12px;font-size:13px;">
+        <button class="btn-primary" style="padding:8px 14px;font-size:13px;" onclick="sendMiniChat('${adviceId}','${nomePasto.replace(/'/g,'')}',${kcal})">→</button>
+      </div>`;
     adviceEl.classList.add('visible');
     btn.textContent = '💡 Nascondi';
-  } catch {
-    adviceEl.innerHTML = '⚠️ Consiglio non disponibile al momento.';
+
+    // Store context for this mini chat
+    window._miniChatContext = window._miniChatContext || {};
+    window._miniChatContext[adviceId] = {
+      piatto: nomePasto,
+      kcal,
+      history: [{ role: 'assistant', content: testo.trim() }]
+    };
+  } catch(err) {
+    adviceEl.innerHTML = `⚠️ Errore: ${err.message}`;
     adviceEl.classList.add('visible');
     btn.textContent = '💡 Consiglio';
   }
   btn.classList.remove('loading');
+}
+
+async function sendMiniChat(adviceId, nomePasto, kcal) {
+  const inputEl = document.getElementById(`miniinput_${adviceId}`);
+  const chatEl = document.getElementById(`minichat_${adviceId}`);
+  const domanda = inputEl.value.trim();
+  if (!domanda) return;
+
+  inputEl.value = '';
+  const ctx = window._miniChatContext[adviceId];
+
+  // Mostra domanda utente
+  chatEl.innerHTML += `<div style="background:var(--sage);color:white;border-radius:12px 12px 4px 12px;padding:8px 12px;font-size:13px;align-self:flex-end;max-width:85%;margin-left:auto;">${domanda}</div>`;
+  chatEl.innerHTML += `<div id="minitying_${adviceId}" style="font-size:12px;color:var(--muted);padding:4px 0;">...</div>`;
+  chatEl.scrollTop = chatEl.scrollHeight;
+
+  ctx.history.push({ role: 'user', content: domanda });
+
+  try {
+    const systemMsg = `Sei una nutrizionista esperta che aiuta Erika (morbo di Crohn, no glutine, poco lattosio, low-carb, target 1450 kcal). Stiamo parlando del piatto: "${nomePasto}" (~${kcal} kcal). Rispondi in italiano, in modo conciso e pratico (max 3 righe).`;
+
+    const messages = [{ role: 'system', content: systemMsg }, ...ctx.history];
+
+    const res = await fetch(OR_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages,
+        max_tokens: 400
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const risposta = data.choices[0].message.content;
+
+    ctx.history.push({ role: 'assistant', content: risposta });
+
+    const typingEl = document.getElementById(`minitying_${adviceId}`);
+    if (typingEl) typingEl.remove();
+
+    chatEl.innerHTML += `<div style="background:var(--sage-pale);border:1px solid var(--sage-light);border-radius:12px 12px 12px 4px;padding:8px 12px;font-size:13px;max-width:90%;">${risposta.trim().replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    chatEl.scrollTop = chatEl.scrollHeight;
+  } catch {
+    const typingEl = document.getElementById(`minitying_${adviceId}`);
+    if (typingEl) typingEl.textContent = '⚠️ Errore. Riprova.';
+  }
+
+  // Enter key support
+  inputEl.onkeydown = (e) => { if (e.key === 'Enter') sendMiniChat(adviceId, nomePasto, kcal); };
 }
 
 // ─── INSPO PHOTO ──────────────────────────────────────────────────
